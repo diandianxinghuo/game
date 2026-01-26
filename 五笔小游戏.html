@@ -182,7 +182,7 @@
         }
 
         .boat.left-facing .sail {
-            transform: scaleX(-1); /* 让文字正常显示 */
+            transform: scaleX(-1); /* 让文字/图片正常显示 */
         }
 
         .boat-body {
@@ -226,6 +226,15 @@
             font-weight: bold;
             color: #8b0000;
             text-shadow: 1px 1px 0 #000;
+            overflow: hidden;
+        }
+
+        /* 船帆上的字根图片 */
+        .sail img {
+            max-width: 48px;
+            max-height: 36px;
+            object-fit: contain;
+            image-rendering: pixelated;
         }
 
         .flag {
@@ -521,6 +530,24 @@
             0%, 100% { transform: translateY(-50%) translateX(0); }
             50% { transform: translateY(-50%) translateX(5px); }
         }
+
+        /* 加载状态 */
+        .loading-info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .image-mode-toggle {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        .image-mode-toggle label {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -578,6 +605,14 @@
             <h1>🎮 五笔打字游戏</h1>
             <p>经典小霸王游戏复刻版</p>
             <p>输入船帆上汉字的五笔编码来击沉船只</p>
+            
+            <div class="image-mode-toggle">
+                <label>
+                    <input type="checkbox" id="useImageMode"> 
+                    使用图片字根模式（需要先添加字根图片）
+                </label>
+            </div>
+            
             <div class="difficulty-select">
                 <label><input type="radio" name="difficulty" value="easy" checked> 简单</label>
                 <label><input type="radio" name="difficulty" value="normal"> 普通</label>
@@ -585,6 +620,7 @@
             </div>
             <button class="btn" id="startBtn">开始游戏</button>
             <p style="margin-top: 30px; font-size: 14px;">提示：使用键盘输入五笔编码，空格键确认发射</p>
+            <div class="loading-info" id="loadingInfo"></div>
         </div>
 
         <!-- 游戏结束界面 -->
@@ -613,7 +649,6 @@
                 }
             }
 
-            // 发射音效
             playShoot() {
                 if (!this.initialized) this.init();
                 if (!this.audioContext) return;
@@ -635,7 +670,6 @@
                 oscillator.stop(this.audioContext.currentTime + 0.1);
             }
 
-            // 爆炸音效
             playExplosion() {
                 if (!this.initialized) this.init();
                 if (!this.audioContext) return;
@@ -667,7 +701,6 @@
                 source.start();
             }
 
-            // 错误音效
             playError() {
                 if (!this.initialized) this.init();
                 if (!this.audioContext) return;
@@ -691,68 +724,75 @@
 
         const soundManager = new SoundManager();
 
-        // 五笔字根数据 - 键位对应字根
-        // 五笔字根数据 - 根据标准86版五笔字根表
-        const wubiData = {
-            // ===== 横区 (11-15) G F D S A =====
-            // 11 G 王旁青头戋五一
-            'G': ['王', '一', '五', '戋', '青'],
-            // 12 F 土士二干十寸雨
-            'F': ['土', '士', '二', '干', '十', '寸', '雨', '甫'],
-            // 13 D 大犬三古石厂
-            'D': ['大', '犬', '三', '古', '石', '厂', '长'],
-            // 14 S 木丁西
+        // ============================================
+        // 字根配置 - 支持文字模式和图片模式
+        // ============================================
+        
+        // 文字模式的字根数据（备用）
+        const wubiTextData = {
+            'G': ['王', '一', '五'],
+            'F': ['土', '二', '干', '十', '寸', '雨'],
+            'D': ['大', '三', '古', '石', '厂'],
             'S': ['木', '丁', '西'],
-            // 15 A 工戈草头右框七
-            'A': ['工', '戈', '七', '弋', '廿', '艹', '匚'],
-            
-            // ===== 竖区 (21-25) H J K L M =====
-            // 21 H 目具上止卜虎皮
-            'H': ['目', '且', '上', '止', '卜', '虍'],
-            // 22 J 日早两竖与虫依
-            'J': ['日', '曰', '早', '虫', '刂'],
-            // 23 K 口与川
+            'A': ['工', '戈', '七'],
+            'H': ['目', '上', '止', '卜'],
+            'J': ['日', '早', '虫'],
             'K': ['口', '川'],
-            // 24 L 田甲方框四车力
-            'L': ['田', '甲', '四', '皿', '车', '力', '罒'],
-            // 25 M 山由贝骨下框几
-            'M': ['山', '由', '贝', '骨', '几', '冂'],
-            
-            // ===== 撇区 (31-35) T R E W Q =====
-            // 31 T 禾竹一撇双人立
-            'T': ['禾', '竹', '夂', '攵', '彳', '丿'],
-            // 32 R 白手看头三二斤
-            'R': ['白', '手', '斤', '气', '扌', '才'],
-            // 33 E 月彡乃用家衣底
-            'E': ['月', '用', '乃', '彡', '豕', '衣'],
-            // 34 W 人和八三四里
-            'W': ['人', '八', '亻', '癶', '祭'],
-            // 35 Q 金勺缺点无尾鱼
-            'Q': ['金', '夕', '儿', '犭', '牛', '勹'],
-            
-            // ===== 捺区 (41-45) Y U I O P =====
-            // 41 Y 言文方广在四一
-            'Y': ['言', '文', '方', '广', '亠', '高', '主'],
-            // 42 U 立辛两点六门病
-            'U': ['立', '辛', '六', '门', '疒'],
-            // 43 I 水旁兴头小倒立
-            'I': ['水', '氵', '小'],
-            // 44 O 火业头四点米
-            'O': ['火', '米', '灬', '业'],
-            // 45 P 之宝盖摘示衣
-            'P': ['之', '辶', '宀', '廴'],
-            
-            // ===== 折区 (51-55) N B V C X =====
-            // 51 N 已半巳满不出己
-            'N': ['已', '己', '巳', '尸', '心', '忄', '羽'],
-            // 52 B 子耳了也框向上
-            'B': ['子', '耳', '了', '也', '阝', '卩'],
-            // 53 V 女刀九臼山朝西
-            'V': ['女', '刀', '九', '臼', '彐'],
-            // 54 C 又巴马丢矢
-            'C': ['又', '巴', '马', '厶'],
-            // 55 X 慈母无心弓和匕
-            'X': ['纟', '幺', '弓', '匕', '母']
+            'L': ['田', '四', '车', '力'],
+            'M': ['山', '由', '贝', '几'],
+            'T': ['禾', '竹'],
+            'R': ['白', '手', '斤'],
+            'E': ['月', '用', '乃'],
+            'W': ['人', '八'],
+            'Q': ['金', '夕', '儿'],
+            'Y': ['言', '文', '方', '广'],
+            'U': ['立', '六', '门'],
+            'I': ['水', '小'],
+            'O': ['火', '米'],
+            'P': ['之'],
+            'N': ['已', '己', '尸', '心'],
+            'B': ['子', '耳', '了', '也'],
+            'V': ['女', '刀', '九'],
+            'C': ['又', '巴', '马'],
+            'X': ['弓', '匕', '母']
+        };
+
+        // 图片模式的字根配置
+        // 每个键对应的字根图片数量，图片命名格式: radicals/键位_序号.png
+        // 例如: radicals/G_1.png, radicals/G_2.png, ...
+        const wubiImageData = {
+            'G': { count: 0, loaded: [] },  // 11 王一五戋
+            'F': { count: 0, loaded: [] },  // 12 土士二干十寸雨
+            'D': { count: 0, loaded: [] },  // 13 大犬三古石厂
+            'S': { count: 0, loaded: [] },  // 14 木丁西
+            'A': { count: 0, loaded: [] },  // 15 工戈草头七
+            'H': { count: 0, loaded: [] },  // 21 目上止卜虎
+            'J': { count: 0, loaded: [] },  // 22 日早虫曰
+            'K': { count: 0, loaded: [] },  // 23 口川
+            'L': { count: 0, loaded: [] },  // 24 田四车力皿
+            'M': { count: 0, loaded: [] },  // 25 山由贝几
+            'T': { count: 0, loaded: [] },  // 31 禾竹撇
+            'R': { count: 0, loaded: [] },  // 32 白手斤气
+            'E': { count: 0, loaded: [] },  // 33 月用乃衣
+            'W': { count: 0, loaded: [] },  // 34 人八
+            'Q': { count: 0, loaded: [] },  // 35 金夕儿犭
+            'Y': { count: 0, loaded: [] },  // 41 言文方广
+            'U': { count: 0, loaded: [] },  // 42 立辛六门病
+            'I': { count: 0, loaded: [] },  // 43 水小
+            'O': { count: 0, loaded: [] },  // 44 火米
+            'P': { count: 0, loaded: [] },  // 45 之辶宀
+            'N': { count: 0, loaded: [] },  // 51 已己巳尸心
+            'B': { count: 0, loaded: [] },  // 52 子耳了也
+            'V': { count: 0, loaded: [] },  // 53 女刀九臼
+            'C': { count: 0, loaded: [] },  // 54 又巴马
+            'X': { count: 0, loaded: [] }   // 55 纟幺弓匕母
+        };
+
+        // 游戏配置
+        let gameConfig = {
+            useImageMode: false,
+            imagesLoaded: false,
+            availableKeys: []  // 有可用字根的键位
         };
 
         // 游戏状态
@@ -791,6 +831,8 @@
         const finalScoreEl = document.getElementById('finalScore');
         const cannonLeft = document.getElementById('cannonLeft');
         const cannonRight = document.getElementById('cannonRight');
+        const loadingInfo = document.getElementById('loadingInfo');
+        const useImageModeCheckbox = document.getElementById('useImageMode');
 
         // 船只颜色
         const boatColors = ['pink', 'green', 'brown', 'blue', 'orange'];
@@ -810,13 +852,80 @@
             }
         }
 
+        // 预加载图片 - 检测每个键位有多少可用图片
+        async function preloadImages() {
+            loadingInfo.textContent = '正在检测字根图片...';
+            let totalImages = 0;
+
+            for (const key of Object.keys(wubiImageData)) {
+                const keyData = wubiImageData[key];
+                keyData.loaded = [];
+                
+                // 尝试加载每个键的图片，最多检测20张
+                for (let i = 1; i <= 20; i++) {
+                    const imgPath = `radicals/${key}_${i}.png`;
+                    const exists = await checkImageExists(imgPath);
+                    if (exists) {
+                        keyData.loaded.push(imgPath);
+                        keyData.count = i;
+                        totalImages++;
+                    } else {
+                        break; // 遇到不存在的就停止
+                    }
+                }
+            }
+
+            // 更新可用键位
+            gameConfig.availableKeys = Object.keys(wubiImageData).filter(
+                key => wubiImageData[key].count > 0
+            );
+
+            if (totalImages > 0) {
+                loadingInfo.textContent = `已加载 ${totalImages} 个字根图片，覆盖 ${gameConfig.availableKeys.length} 个键位`;
+                gameConfig.imagesLoaded = true;
+            } else {
+                loadingInfo.textContent = '未找到字根图片，将使用文字模式';
+                gameConfig.imagesLoaded = false;
+            }
+
+            return totalImages;
+        }
+
+        // 检测图片是否存在
+        function checkImageExists(src) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = src;
+            });
+        }
+
         // 获取随机字根
-        function getRandomChar() {
-            const keys = Object.keys(wubiData);
-            const key = keys[Math.floor(Math.random() * keys.length)];
-            const chars = wubiData[key];
-            const char = chars[Math.floor(Math.random() * chars.length)];
-            return { char, key };
+        function getRandomRadical() {
+            if (gameConfig.useImageMode && gameConfig.imagesLoaded && gameConfig.availableKeys.length > 0) {
+                // 图片模式
+                const key = gameConfig.availableKeys[Math.floor(Math.random() * gameConfig.availableKeys.length)];
+                const keyData = wubiImageData[key];
+                const imgIndex = Math.floor(Math.random() * keyData.count);
+                const imgPath = keyData.loaded[imgIndex];
+                return { 
+                    key: key, 
+                    display: `<img src="${imgPath}" alt="${key}">`,
+                    isImage: true
+                };
+            } else {
+                // 文字模式
+                const keys = Object.keys(wubiTextData);
+                const key = keys[Math.floor(Math.random() * keys.length)];
+                const chars = wubiTextData[key];
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                return { 
+                    key: key, 
+                    display: char,
+                    isImage: false
+                };
+            }
         }
 
         // 创建船只
@@ -824,12 +933,11 @@
             const settings = difficultySettings[gameState.difficulty];
             if (gameState.boats.length >= settings.maxBoats) return;
 
-            const { char, key } = getRandomChar();
+            const radical = getRandomRadical();
             const boat = document.createElement('div');
             const color = boatColors[Math.floor(Math.random() * boatColors.length)];
             const direction = Math.random() > 0.5 ? 1 : -1;
             const startX = direction === 1 ? -120 : 820;
-            // 船只可以在整个游戏区域显示（从顶部到底部）
             const yPos = Math.random() * 350;
 
             boat.className = `boat ${color}`;
@@ -840,7 +948,7 @@
             boat.innerHTML = `
                 <div class="flag"></div>
                 <div class="mast"></div>
-                <div class="sail">${char}</div>
+                <div class="sail">${radical.display}</div>
                 <div class="boat-cabin"></div>
                 <div class="boat-body"></div>
             `;
@@ -849,8 +957,7 @@
 
             const boatData = {
                 element: boat,
-                char: char,
-                key: key,
+                key: radical.key,
                 x: startX,
                 y: yPos,
                 direction: direction,
@@ -865,14 +972,13 @@
         function createBullet(targetBoat) {
             const fromLeft = targetBoat.x > 400;
             const startX = fromLeft ? 40 : 760;
-            const startY = targetBoat.y + 90; // 调整到船的中心位置（考虑game-area的偏移）
+            const startY = targetBoat.y + 90;
             
             const bullet = document.createElement('div');
             bullet.className = 'bullet' + (fromLeft ? '' : ' left');
             bullet.style.left = startX + 'px';
             bullet.style.top = startY + 'px';
 
-            // 触发炮台动画
             if (fromLeft) {
                 cannonLeft.style.top = (startY + 50) + 'px';
                 cannonLeft.classList.add('firing');
@@ -897,7 +1003,6 @@
             document.querySelector('.game-container').appendChild(bullet);
             gameState.bullets.push(bulletData);
 
-            // 播放发射音效
             soundManager.playShoot();
         }
 
@@ -909,13 +1014,11 @@
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < 20) {
-                    // 命中目标
                     bullet.element.remove();
                     hitBoat(bullet.targetBoat);
                     return false;
                 }
 
-                // 移动子弹
                 const vx = (dx / distance) * bullet.speed;
                 const vy = (dy / distance) * bullet.speed;
                 bullet.x += vx;
@@ -932,10 +1035,7 @@
             const index = gameState.boats.indexOf(boat);
             if (index === -1) return;
 
-            // 创建爆炸效果
             createExplosion(boat.x + 50, boat.y + 90);
-            
-            // 播放爆炸音效
             soundManager.playExplosion();
 
             boat.element.classList.add('sinking');
@@ -947,7 +1047,6 @@
             gameState.score += 10 * gameState.level;
             scoreEl.textContent = gameState.score;
 
-            // 升级检查
             if (gameState.score >= gameState.level * 100) {
                 levelUp();
             }
@@ -959,7 +1058,6 @@
                 boat.x += boat.direction * boat.speed;
                 boat.element.style.left = boat.x + 'px';
 
-                // 检查是否出界
                 if ((boat.direction === 1 && boat.x > 820) || 
                     (boat.direction === -1 && boat.x < -120)) {
                     boat.element.remove();
@@ -999,7 +1097,6 @@
             for (let i = gameState.boats.length - 1; i >= 0; i--) {
                 const boat = gameState.boats[i];
                 if (boat.key === input) {
-                    // 发射子弹
                     hit = true;
                     createBullet(boat);
                     break;
@@ -1010,7 +1107,6 @@
             inputCodeEl.textContent = '_';
 
             if (!hit && input.length > 0) {
-                // 输入错误反馈
                 inputCodeEl.style.color = '#f00';
                 soundManager.playError();
                 setTimeout(() => {
@@ -1034,7 +1130,6 @@
             gameState.level++;
             levelEl.textContent = gameState.level;
             
-            // 加快生成速度
             const settings = difficultySettings[gameState.difficulty];
             const newRate = Math.max(500, settings.spawnRate - gameState.level * 200);
             
@@ -1052,15 +1147,15 @@
 
         // 开始游戏
         function startGame() {
-            // 初始化音效
             soundManager.init();
 
-            // 获取难度
             const difficultyInput = document.querySelector('input[name="difficulty"]:checked');
             gameState.difficulty = difficultyInput.value;
             const settings = difficultySettings[gameState.difficulty];
 
-            // 重置状态
+            // 检查图片模式
+            gameConfig.useImageMode = useImageModeCheckbox.checked;
+
             gameState.isPlaying = true;
             gameState.score = 0;
             gameState.level = 1;
@@ -1074,20 +1169,16 @@
             updateLivesDisplay();
             inputCodeEl.textContent = '_';
 
-            // 清除旧船只和子弹
             gameArea.querySelectorAll('.boat').forEach(b => b.remove());
             document.querySelectorAll('.bullet').forEach(b => b.remove());
             document.querySelectorAll('.explosion').forEach(e => e.remove());
 
-            // 隐藏界面
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
 
-            // 开始生成船只
             gameState.spawnInterval = setInterval(createBoat, settings.spawnRate);
-            createBoat(); // 立即创建一个
+            createBoat();
 
-            // 开始游戏循环
             gameLoop();
         }
 
@@ -1114,7 +1205,7 @@
             }
 
             if (e.key === ' ') {
-                e.preventDefault(); // 防止页面滚动
+                e.preventDefault();
                 checkInput();
             } else if (e.key === 'Backspace') {
                 e.preventDefault();
@@ -1123,8 +1214,6 @@
             } else if (/^[a-zA-Z]$/.test(e.key) && gameState.currentInput.length < 4) {
                 gameState.currentInput += e.key.toUpperCase();
                 inputCodeEl.textContent = gameState.currentInput;
-                
-                // 更新提示
                 updateHint();
             }
         });
@@ -1132,8 +1221,8 @@
         // 更新提示
         function updateHint() {
             const key = gameState.currentInput.toUpperCase();
-            if (key && wubiData[key]) {
-                hintContent.textContent = `${key}键字根: ${wubiData[key].join('、')}`;
+            if (key && wubiTextData[key]) {
+                hintContent.textContent = `${key}键字根: ${wubiTextData[key].join('、')}`;
             } else {
                 hintContent.textContent = '输入字根对应的五笔键位击沉船只！';
             }
@@ -1143,8 +1232,18 @@
         startBtn.addEventListener('click', startGame);
         restartBtn.addEventListener('click', startGame);
 
+        // 图片模式切换
+        useImageModeCheckbox.addEventListener('change', async () => {
+            if (useImageModeCheckbox.checked && !gameConfig.imagesLoaded) {
+                await preloadImages();
+            }
+        });
+
         // 初始化
         createClouds();
+        
+        // 页面加载时尝试预加载图片
+        preloadImages();
     </script>
 </body>
 </html>
