@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小霸王五笔打字游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            width: 800px;
+            height: 600px;
+            position: relative;
+            border: 4px solid #333;
+            overflow: hidden;
+        }
+
+        /* 天空 */
+        .sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 45%;
+            background: linear-gradient(to bottom, #4a90d9 0%, #6ba3e0 100%);
+        }
+
+        /* 云朵 */
+        .cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 20px;
+            animation: floatCloud 20s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 30px;
+            height: 30px;
+            top: -15px;
+            left: 10px;
+        }
+
+        .cloud::after {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            right: 10px;
+        }
+
+        @keyframes floatCloud {
+            from { transform: translateX(-100px); }
+            to { transform: translateX(900px); }
+        }
+
+        /* 海滩/沙地 */
+        .beach {
+            position: absolute;
+            top: 45%;
+            left: 0;
+            width: 100%;
+            height: 8%;
+            background: linear-gradient(to bottom, #c4a35a 0%, #d4a84a 50%, #c49a3a 100%);
+            image-rendering: pixelated;
+        }
+
+        .beach::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                #8b7355 0px,
+                #8b7355 4px,
+                #c4a35a 4px,
+                #c4a35a 8px
+            );
+        }
+
+        /* 海洋 */
+        .sea {
+            position: absolute;
+            top: 53%;
+            left: 0;
+            width: 100%;
+            height: 47%;
+            background: linear-gradient(to bottom, #1a4a8a 0%, #0a2a5a 100%);
+            overflow: hidden;
+        }
+
+        /* 海面波浪效果 */
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                rgba(255, 255, 255, 0.1) 2px,
+                transparent 4px
+            );
+            animation: waveMove 3s linear infinite;
+        }
+
+        @keyframes waveMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        /* 太阳反光 */
+        .sun-reflection {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.2) 30%,
+                rgba(255, 255, 255, 0.1) 60%,
+                transparent 100%
+            );
+        }
+
+        /* 船只 */
+        .boat {
+            position: absolute;
+            width: 100px;
+            height: 80px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .boat.sinking {
+            animation: sink 0.5s ease-in forwards;
+        }
+
+        @keyframes sink {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100px) rotate(20deg); opacity: 0; }
+        }
+
+        .boat-body {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 80px;
+            height: 25px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .boat-cabin {
+            position: absolute;
+            bottom: 25px;
+            left: 30px;
+            width: 30px;
+            height: 15px;
+        }
+
+        .mast {
+            position: absolute;
+            bottom: 25px;
+            left: 48px;
+            width: 4px;
+            height: 50px;
+            background: #8b4513;
+        }
+
+        .sail {
+            position: absolute;
+            bottom: 35px;
+            left: 20px;
+            width: 55px;
+            height: 40px;
+            background: #fff8dc;
+            border: 2px solid #8b4513;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #8b0000;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .flag {
+            position: absolute;
+            bottom: 70px;
+            left: 52px;
+            width: 20px;
+            height: 12px;
+            clip-path: polygon(0 0, 100% 50%, 0 100%);
+        }
+
+        /* 不同颜色的船 */
+        .boat.pink .boat-body { background: #ff69b4; }
+        .boat.pink .boat-cabin { background: #ff1493; }
+        .boat.pink .flag { background: #ff69b4; }
+
+        .boat.green .boat-body { background: #228b22; }
+        .boat.green .boat-cabin { background: #006400; }
+        .boat.green .flag { background: #32cd32; }
+
+        .boat.brown .boat-body { background: #8b4513; }
+        .boat.brown .boat-cabin { background: #654321; }
+        .boat.brown .flag { background: #d2691e; }
+
+        .boat.blue .boat-body { background: #4169e1; }
+        .boat.blue .boat-cabin { background: #0000cd; }
+        .boat.blue .flag { background: #1e90ff; }
+
+        .boat.orange .boat-body { background: #ff8c00; }
+        .boat.orange .boat-cabin { background: #ff6600; }
+        .boat.orange .flag { background: #ffa500; }
+
+        /* UI界面 */
+        .ui-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .score-panel, .input-panel {
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 18px;
+            border: 2px solid #ffd700;
+        }
+
+        .input-display {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #0f0;
+            padding: 10px 30px;
+            border-radius: 5px;
+            font-size: 24px;
+            font-family: monospace;
+            border: 2px solid #0f0;
+            min-width: 200px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .input-display .label {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .input-display .code {
+            font-size: 28px;
+            letter-spacing: 5px;
+            min-height: 35px;
+        }
+
+        /* 开始界面 */
+        .start-screen, .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 50, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            color: #fff;
+        }
+
+        .start-screen h1, .game-over-screen h1 {
+            font-size: 48px;
+            color: #ffd700;
+            text-shadow: 3px 3px 0 #8b0000;
+            margin-bottom: 30px;
+        }
+
+        .start-screen p {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #aaa;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(to bottom, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .difficulty-select {
+            margin: 20px 0;
+        }
+
+        .difficulty-select label {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .difficulty-select input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .game-over-screen .final-score {
+            font-size: 36px;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        /* 字根提示 */
+        .hint-panel {
+            position: absolute;
+            bottom: 80px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 100;
+            max-width: 200px;
+        }
+
+        .hint-panel h3 {
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        /* 爆炸效果 */
+        .explosion {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ff0 0%, #f00 50%, transparent 70%);
+            border-radius: 50%;
+            animation: explode 0.3s ease-out forwards;
+            pointer-events: none;
+            z-index: 150;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* 生命值 */
+        .lives {
+            display: flex;
+            gap: 5px;
+        }
+
+        .heart {
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            clip-path: path('M10 18l-1.45-1.32C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91.81 10 2.09 11.09.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.5c0 3.78-3.4 6.86-8.55 11.18L10 18z');
+            transform: scale(1);
+        }
+
+        .heart.lost {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 天空 -->
+        <div class="sky" id="sky"></div>
+        
+        <!-- 沙滩 -->
+        <div class="beach"></div>
+        
+        <!-- 海洋 -->
+        <div class="sea" id="sea">
+            <div class="wave"></div>
+            <div class="sun-reflection"></div>
+        </div>
+
+        <!-- UI面板 -->
+        <div class="ui-panel">
+            <div class="score-panel">
+                分数: <span id="score">0</span>
+            </div>
+            <div class="lives" id="lives">
+                <div class="heart"></div>
+                <div class="heart"></div>
+                <div class="heart"></div>
+                <div class="heart"></div>
+                <div class="heart"></div>
+            </div>
+            <div class="score-panel">
+                等级: <span id="level">1</span>
+            </div>
+        </div>
+
+        <!-- 输入显示 -->
+        <div class="input-display">
+            <div class="label">输入五笔编码：</div>
+            <div class="code" id="inputCode">_</div>
+        </div>
+
+        <!-- 字根提示 -->
+        <div class="hint-panel" id="hintPanel">
+            <h3>💡 提示</h3>
+            <div id="hintContent">输入字根对应的五笔键位击沉船只！</div>
+        </div>
+
+        <!-- 开始界面 -->
+        <div class="start-screen" id="startScreen">
+            <h1>🎮 五笔打字游戏</h1>
+            <p>经典小霸王游戏复刻版</p>
+            <p>输入船帆上汉字的五笔编码来击沉船只</p>
+            <div class="difficulty-select">
+                <label><input type="radio" name="difficulty" value="easy" checked> 简单</label>
+                <label><input type="radio" name="difficulty" value="normal"> 普通</label>
+                <label><input type="radio" name="difficulty" value="hard"> 困难</label>
+            </div>
+            <button class="btn" id="startBtn">开始游戏</button>
+            <p style="margin-top: 30px; font-size: 14px;">提示：使用键盘输入五笔编码，回车确认</p>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div class="game-over-screen hidden" id="gameOverScreen">
+            <h1>游戏结束</h1>
+            <div class="final-score">最终得分: <span id="finalScore">0</span></div>
+            <button class="btn" id="restartBtn">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        // 五笔字根数据 - 键位对应字根
+        const wubiData = {
+            // 横区 (G F D S A)
+            'G': ['王', '戋', '五', '一'],
+            'F': ['土', '士', '二', '干', '十', '寸', '雨'],
+            'D': ['大', '犬', '三', '古', '石', '厂'],
+            'S': ['木', '丁', '西'],
+            'A': ['工', '戈', '草', '七'],
+            
+            // 竖区 (H J K L M)
+            'H': ['目', '且', '上', '卜', '虎'],
+            'J': ['日', '早', '虫', '曰'],
+            'K': ['口', '川'],
+            'L': ['田', '甲', '四', '车', '力'],
+            'M': ['山', '由', '贝', '几'],
+            
+            // 撇区 (T R E W Q)
+            'T': ['禾', '竹', '反', '文', '双'],
+            'R': ['白', '手', '斤', '气'],
+            'E': ['月', '用', '乃', '衣'],
+            'W': ['人', '八', '登'],
+            'Q': ['金', '夕', '儿', '犭'],
+            
+            // 捺区 (Y U I O P)
+            'Y': ['言', '文', '方', '广', '高'],
+            'U': ['立', '辛', '六', '门', '病'],
+            'I': ['水', '小', '氵'],
+            'O': ['火', '米', '灬'],
+            'P': ['之', '宝', '辶', '衤'],
+            
+            // 折区 (N B V C X)
+            'N': ['已', '己', '巳', '尸', '心'],
+            'B': ['子', '耳', '了', '也', '乙'],
+            'V': ['女', '刀', '九', '臼'],
+            'C': ['又', '巴', '马'],
+            'X': ['纟', '幺', '母', '弓']
+        };
+
+        // 游戏状态
+        let gameState = {
+            isPlaying: false,
+            score: 0,
+            level: 1,
+            lives: 5,
+            boats: [],
+            currentInput: '',
+            difficulty: 'easy',
+            spawnInterval: null,
+            gameLoop: null
+        };
+
+        // 难度设置
+        const difficultySettings = {
+            easy: { spawnRate: 3000, speed: 0.5, maxBoats: 4 },
+            normal: { spawnRate: 2000, speed: 0.8, maxBoats: 6 },
+            hard: { spawnRate: 1500, speed: 1.2, maxBoats: 8 }
+        };
+
+        // DOM元素
+        const sea = document.getElementById('sea');
+        const sky = document.getElementById('sky');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const livesEl = document.getElementById('lives');
+        const inputCodeEl = document.getElementById('inputCode');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const hintContent = document.getElementById('hintContent');
+        const finalScoreEl = document.getElementById('finalScore');
+
+        // 船只颜色
+        const boatColors = ['pink', 'green', 'brown', 'blue', 'orange'];
+
+        // 初始化云朵
+        function createClouds() {
+            for (let i = 0; i < 5; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.style.width = (40 + Math.random() * 60) + 'px';
+                cloud.style.height = (15 + Math.random() * 15) + 'px';
+                cloud.style.top = (20 + Math.random() * 150) + 'px';
+                cloud.style.left = (Math.random() * 800) + 'px';
+                cloud.style.animationDelay = (-Math.random() * 20) + 's';
+                cloud.style.animationDuration = (15 + Math.random() * 10) + 's';
+                sky.appendChild(cloud);
+            }
+        }
+
+        // 获取随机字根
+        function getRandomChar() {
+            const keys = Object.keys(wubiData);
+            const key = keys[Math.floor(Math.random() * keys.length)];
+            const chars = wubiData[key];
+            const char = chars[Math.floor(Math.random() * chars.length)];
+            return { char, key };
+        }
+
+        // 创建船只
+        function createBoat() {
+            const settings = difficultySettings[gameState.difficulty];
+            if (gameState.boats.length >= settings.maxBoats) return;
+
+            const { char, key } = getRandomChar();
+            const boat = document.createElement('div');
+            const color = boatColors[Math.floor(Math.random() * boatColors.length)];
+            const direction = Math.random() > 0.5 ? 1 : -1;
+            const startX = direction === 1 ? -120 : 820;
+            const yPos = 20 + Math.random() * 150;
+
+            boat.className = `boat ${color}`;
+            boat.innerHTML = `
+                <div class="flag"></div>
+                <div class="mast"></div>
+                <div class="sail">${char}</div>
+                <div class="boat-cabin"></div>
+                <div class="boat-body"></div>
+            `;
+            boat.style.left = startX + 'px';
+            boat.style.top = yPos + 'px';
+            if (direction === -1) {
+                boat.style.transform = 'scaleX(-1)';
+            }
+
+            const boatData = {
+                element: boat,
+                char: char,
+                key: key,
+                x: startX,
+                y: yPos,
+                direction: direction,
+                speed: settings.speed * (0.8 + Math.random() * 0.4)
+            };
+
+            sea.appendChild(boat);
+            gameState.boats.push(boatData);
+        }
+
+        // 更新船只位置
+        function updateBoats() {
+            gameState.boats = gameState.boats.filter(boat => {
+                boat.x += boat.direction * boat.speed;
+                boat.element.style.left = boat.x + 'px';
+
+                // 检查是否出界
+                if ((boat.direction === 1 && boat.x > 820) || 
+                    (boat.direction === -1 && boat.x < -120)) {
+                    boat.element.remove();
+                    loseLife();
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        // 失去生命
+        function loseLife() {
+            gameState.lives--;
+            updateLivesDisplay();
+            if (gameState.lives <= 0) {
+                endGame();
+            }
+        }
+
+        // 更新生命显示
+        function updateLivesDisplay() {
+            const hearts = livesEl.querySelectorAll('.heart');
+            hearts.forEach((heart, index) => {
+                if (index < gameState.lives) {
+                    heart.classList.remove('lost');
+                } else {
+                    heart.classList.add('lost');
+                }
+            });
+        }
+
+        // 检查输入
+        function checkInput() {
+            const input = gameState.currentInput.toUpperCase();
+            let hit = false;
+
+            for (let i = gameState.boats.length - 1; i >= 0; i--) {
+                const boat = gameState.boats[i];
+                if (boat.key === input) {
+                    // 命中！
+                    hit = true;
+                    createExplosion(boat.x + 50, boat.y + 40);
+                    boat.element.classList.add('sinking');
+                    
+                    setTimeout(() => {
+                        boat.element.remove();
+                    }, 500);
+
+                    gameState.boats.splice(i, 1);
+                    gameState.score += 10 * gameState.level;
+                    scoreEl.textContent = gameState.score;
+
+                    // 升级检查
+                    if (gameState.score >= gameState.level * 100) {
+                        levelUp();
+                    }
+                    break;
+                }
+            }
+
+            gameState.currentInput = '';
+            inputCodeEl.textContent = '_';
+
+            if (!hit && input.length > 0) {
+                // 输入错误反馈
+                inputCodeEl.style.color = '#f00';
+                setTimeout(() => {
+                    inputCodeEl.style.color = '#0f0';
+                }, 200);
+            }
+        }
+
+        // 创建爆炸效果
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = (x - 30) + 'px';
+            explosion.style.top = (y - 30) + 'px';
+            sea.appendChild(explosion);
+            setTimeout(() => explosion.remove(), 300);
+        }
+
+        // 升级
+        function levelUp() {
+            gameState.level++;
+            levelEl.textContent = gameState.level;
+            
+            // 加快生成速度
+            const settings = difficultySettings[gameState.difficulty];
+            const newRate = Math.max(500, settings.spawnRate - gameState.level * 200);
+            
+            clearInterval(gameState.spawnInterval);
+            gameState.spawnInterval = setInterval(createBoat, newRate);
+        }
+
+        // 游戏主循环
+        function gameLoop() {
+            if (!gameState.isPlaying) return;
+            updateBoats();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 开始游戏
+        function startGame() {
+            // 获取难度
+            const difficultyInput = document.querySelector('input[name="difficulty"]:checked');
+            gameState.difficulty = difficultyInput.value;
+            const settings = difficultySettings[gameState.difficulty];
+
+            // 重置状态
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.lives = 5;
+            gameState.boats = [];
+            gameState.currentInput = '';
+
+            scoreEl.textContent = '0';
+            levelEl.textContent = '1';
+            updateLivesDisplay();
+            inputCodeEl.textContent = '_';
+
+            // 清除旧船只
+            sea.querySelectorAll('.boat').forEach(b => b.remove());
+
+            // 隐藏界面
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+
+            // 开始生成船只
+            gameState.spawnInterval = setInterval(createBoat, settings.spawnRate);
+            createBoat(); // 立即创建一个
+
+            // 开始游戏循环
+            gameLoop();
+        }
+
+        // 结束游戏
+        function endGame() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.spawnInterval);
+            finalScoreEl.textContent = gameState.score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            if (!gameState.isPlaying) {
+                if (e.key === 'Enter') {
+                    if (!startScreen.classList.contains('hidden')) {
+                        startGame();
+                    } else if (!gameOverScreen.classList.contains('hidden')) {
+                        startGame();
+                    }
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                checkInput();
+            } else if (e.key === 'Backspace') {
+                gameState.currentInput = gameState.currentInput.slice(0, -1);
+                inputCodeEl.textContent = gameState.currentInput || '_';
+            } else if (/^[a-zA-Z]$/.test(e.key) && gameState.currentInput.length < 4) {
+                gameState.currentInput += e.key.toUpperCase();
+                inputCodeEl.textContent = gameState.currentInput;
+                
+                // 更新提示
+                updateHint();
+            }
+        });
+
+        // 更新提示
+        function updateHint() {
+            const key = gameState.currentInput.toUpperCase();
+            if (key && wubiData[key]) {
+                hintContent.textContent = `${key}键字根: ${wubiData[key].join('、')}`;
+            } else {
+                hintContent.textContent = '输入字根对应的五笔键位击沉船只！';
+            }
+        }
+
+        // 按钮事件
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+        // 初始化
+        createClouds();
+    </script>
+</body>
+</html>
