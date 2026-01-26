@@ -147,13 +147,24 @@
             );
         }
 
+        /* 游戏区域 - 船只在这里显示 */
+        .game-area {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 120px);
+            pointer-events: none;
+            z-index: 50;
+        }
+
         /* 船只 */
         .boat {
             position: absolute;
             width: 100px;
             height: 80px;
-            transition: transform 0.3s;
             cursor: pointer;
+            pointer-events: auto;
         }
 
         .boat.sinking {
@@ -163,6 +174,15 @@
         @keyframes sink {
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100px) rotate(20deg); opacity: 0; }
+        }
+
+        /* 向左行驶的船（从右到左） */
+        .boat.left-facing {
+            transform: scaleX(-1);
+        }
+
+        .boat.left-facing .sail {
+            transform: scaleX(-1); /* 让文字正常显示 */
         }
 
         .boat-body {
@@ -237,6 +257,34 @@
         .boat.orange .boat-body { background: #ff8c00; }
         .boat.orange .boat-cabin { background: #ff6600; }
         .boat.orange .flag { background: #ffa500; }
+
+        /* 子弹 */
+        .bullet {
+            position: absolute;
+            width: 20px;
+            height: 8px;
+            background: linear-gradient(to right, #ff0, #f80);
+            border-radius: 4px;
+            z-index: 100;
+            box-shadow: 0 0 10px #ff0, 0 0 20px #f80;
+        }
+
+        .bullet::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid #ff0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .bullet.left {
+            transform: scaleX(-1);
+        }
 
         /* UI界面 */
         .ui-panel {
@@ -380,17 +428,18 @@
         /* 爆炸效果 */
         .explosion {
             position: absolute;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle, #ff0 0%, #f00 50%, transparent 70%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 0%, #ff0 20%, #f80 40%, #f00 60%, transparent 70%);
             border-radius: 50%;
-            animation: explode 0.3s ease-out forwards;
+            animation: explode 0.4s ease-out forwards;
             pointer-events: none;
             z-index: 150;
         }
 
         @keyframes explode {
-            0% { transform: scale(0); opacity: 1; }
+            0% { transform: scale(0.3); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
             100% { transform: scale(2); opacity: 0; }
         }
 
@@ -411,6 +460,67 @@
         .heart.lost {
             background: #333;
         }
+
+        /* 炮台 */
+        .cannon {
+            position: absolute;
+            width: 40px;
+            height: 30px;
+            background: #333;
+            border-radius: 5px;
+            z-index: 60;
+        }
+
+        .cannon.left {
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 0 10px 10px 0;
+        }
+
+        .cannon.right {
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 10px 0 0 10px;
+        }
+
+        .cannon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 12px;
+            background: #555;
+            border-radius: 3px;
+        }
+
+        .cannon.left::after {
+            right: -10px;
+        }
+
+        .cannon.right::after {
+            left: -10px;
+        }
+
+        .cannon.firing {
+            animation: recoil 0.1s ease-out;
+        }
+
+        @keyframes recoil {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(-5px); }
+        }
+
+        .cannon.right.firing {
+            animation: recoilRight 0.1s ease-out;
+        }
+
+        @keyframes recoilRight {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(5px); }
+        }
     </style>
 </head>
 <body>
@@ -426,6 +536,13 @@
             <div class="wave"></div>
             <div class="sun-reflection"></div>
         </div>
+
+        <!-- 游戏区域 - 船只在这里显示 -->
+        <div class="game-area" id="gameArea"></div>
+
+        <!-- 炮台 -->
+        <div class="cannon left" id="cannonLeft"></div>
+        <div class="cannon right" id="cannonRight"></div>
 
         <!-- UI面板 -->
         <div class="ui-panel">
@@ -446,7 +563,7 @@
 
         <!-- 输入显示 -->
         <div class="input-display">
-            <div class="label">输入五笔编码：</div>
+            <div class="label">输入五笔编码（空格确认）：</div>
             <div class="code" id="inputCode">_</div>
         </div>
 
@@ -467,7 +584,7 @@
                 <label><input type="radio" name="difficulty" value="hard"> 困难</label>
             </div>
             <button class="btn" id="startBtn">开始游戏</button>
-            <p style="margin-top: 30px; font-size: 14px;">提示：使用键盘输入五笔编码，回车确认</p>
+            <p style="margin-top: 30px; font-size: 14px;">提示：使用键盘输入五笔编码，空格键确认发射</p>
         </div>
 
         <!-- 游戏结束界面 -->
@@ -479,6 +596,101 @@
     </div>
 
     <script>
+        // 音效系统 - 使用 Web Audio API 生成音效
+        class SoundManager {
+            constructor() {
+                this.audioContext = null;
+                this.initialized = false;
+            }
+
+            init() {
+                if (this.initialized) return;
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.initialized = true;
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                }
+            }
+
+            // 发射音效
+            playShoot() {
+                if (!this.initialized) this.init();
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.1);
+            }
+
+            // 爆炸音效
+            playExplosion() {
+                if (!this.initialized) this.init();
+                if (!this.audioContext) return;
+
+                const bufferSize = this.audioContext.sampleRate * 0.3;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+                }
+
+                const source = this.audioContext.createBufferSource();
+                const gainNode = this.audioContext.createGain();
+                const filter = this.audioContext.createBiquadFilter();
+
+                source.buffer = buffer;
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1000, this.audioContext.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.3);
+
+                gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                source.start();
+            }
+
+            // 错误音效
+            playError() {
+                if (!this.initialized) this.init();
+                if (!this.audioContext) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime);
+
+                gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.15);
+            }
+        }
+
+        const soundManager = new SoundManager();
+
         // 五笔字根数据 - 键位对应字根
         const wubiData = {
             // 横区 (G F D S A)
@@ -524,6 +736,7 @@
             level: 1,
             lives: 5,
             boats: [],
+            bullets: [],
             currentInput: '',
             difficulty: 'easy',
             spawnInterval: null,
@@ -538,7 +751,7 @@
         };
 
         // DOM元素
-        const sea = document.getElementById('sea');
+        const gameArea = document.getElementById('gameArea');
         const sky = document.getElementById('sky');
         const scoreEl = document.getElementById('score');
         const levelEl = document.getElementById('level');
@@ -550,6 +763,8 @@
         const restartBtn = document.getElementById('restartBtn');
         const hintContent = document.getElementById('hintContent');
         const finalScoreEl = document.getElementById('finalScore');
+        const cannonLeft = document.getElementById('cannonLeft');
+        const cannonRight = document.getElementById('cannonRight');
 
         // 船只颜色
         const boatColors = ['pink', 'green', 'brown', 'blue', 'orange'];
@@ -588,9 +803,14 @@
             const color = boatColors[Math.floor(Math.random() * boatColors.length)];
             const direction = Math.random() > 0.5 ? 1 : -1;
             const startX = direction === 1 ? -120 : 820;
-            const yPos = 20 + Math.random() * 150;
+            // 船只可以在整个游戏区域显示（从顶部到底部）
+            const yPos = Math.random() * 350;
 
             boat.className = `boat ${color}`;
+            if (direction === -1) {
+                boat.classList.add('left-facing');
+            }
+            
             boat.innerHTML = `
                 <div class="flag"></div>
                 <div class="mast"></div>
@@ -600,9 +820,6 @@
             `;
             boat.style.left = startX + 'px';
             boat.style.top = yPos + 'px';
-            if (direction === -1) {
-                boat.style.transform = 'scaleX(-1)';
-            }
 
             const boatData = {
                 element: boat,
@@ -614,8 +831,100 @@
                 speed: settings.speed * (0.8 + Math.random() * 0.4)
             };
 
-            sea.appendChild(boat);
+            gameArea.appendChild(boat);
             gameState.boats.push(boatData);
+        }
+
+        // 创建子弹
+        function createBullet(targetBoat) {
+            const fromLeft = targetBoat.x > 400;
+            const startX = fromLeft ? 40 : 760;
+            const startY = targetBoat.y + 90; // 调整到船的中心位置（考虑game-area的偏移）
+            
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet' + (fromLeft ? '' : ' left');
+            bullet.style.left = startX + 'px';
+            bullet.style.top = startY + 'px';
+
+            // 触发炮台动画
+            if (fromLeft) {
+                cannonLeft.style.top = (startY + 50) + 'px';
+                cannonLeft.classList.add('firing');
+                setTimeout(() => cannonLeft.classList.remove('firing'), 100);
+            } else {
+                cannonRight.style.top = (startY + 50) + 'px';
+                cannonRight.classList.add('firing');
+                setTimeout(() => cannonRight.classList.remove('firing'), 100);
+            }
+
+            const bulletData = {
+                element: bullet,
+                x: startX,
+                y: startY,
+                targetX: targetBoat.x + 50,
+                targetY: targetBoat.y + 40,
+                targetBoat: targetBoat,
+                speed: 15,
+                fromLeft: fromLeft
+            };
+
+            document.querySelector('.game-container').appendChild(bullet);
+            gameState.bullets.push(bulletData);
+
+            // 播放发射音效
+            soundManager.playShoot();
+        }
+
+        // 更新子弹位置
+        function updateBullets() {
+            gameState.bullets = gameState.bullets.filter(bullet => {
+                const dx = bullet.targetX - bullet.x;
+                const dy = bullet.targetY - bullet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 20) {
+                    // 命中目标
+                    bullet.element.remove();
+                    hitBoat(bullet.targetBoat);
+                    return false;
+                }
+
+                // 移动子弹
+                const vx = (dx / distance) * bullet.speed;
+                const vy = (dy / distance) * bullet.speed;
+                bullet.x += vx;
+                bullet.y += vy;
+                bullet.element.style.left = bullet.x + 'px';
+                bullet.element.style.top = bullet.y + 'px';
+
+                return true;
+            });
+        }
+
+        // 命中船只
+        function hitBoat(boat) {
+            const index = gameState.boats.indexOf(boat);
+            if (index === -1) return;
+
+            // 创建爆炸效果
+            createExplosion(boat.x + 50, boat.y + 90);
+            
+            // 播放爆炸音效
+            soundManager.playExplosion();
+
+            boat.element.classList.add('sinking');
+            setTimeout(() => {
+                boat.element.remove();
+            }, 500);
+
+            gameState.boats.splice(index, 1);
+            gameState.score += 10 * gameState.level;
+            scoreEl.textContent = gameState.score;
+
+            // 升级检查
+            if (gameState.score >= gameState.level * 100) {
+                levelUp();
+            }
         }
 
         // 更新船只位置
@@ -664,23 +973,9 @@
             for (let i = gameState.boats.length - 1; i >= 0; i--) {
                 const boat = gameState.boats[i];
                 if (boat.key === input) {
-                    // 命中！
+                    // 发射子弹
                     hit = true;
-                    createExplosion(boat.x + 50, boat.y + 40);
-                    boat.element.classList.add('sinking');
-                    
-                    setTimeout(() => {
-                        boat.element.remove();
-                    }, 500);
-
-                    gameState.boats.splice(i, 1);
-                    gameState.score += 10 * gameState.level;
-                    scoreEl.textContent = gameState.score;
-
-                    // 升级检查
-                    if (gameState.score >= gameState.level * 100) {
-                        levelUp();
-                    }
+                    createBullet(boat);
                     break;
                 }
             }
@@ -691,6 +986,7 @@
             if (!hit && input.length > 0) {
                 // 输入错误反馈
                 inputCodeEl.style.color = '#f00';
+                soundManager.playError();
                 setTimeout(() => {
                     inputCodeEl.style.color = '#0f0';
                 }, 200);
@@ -701,10 +997,10 @@
         function createExplosion(x, y) {
             const explosion = document.createElement('div');
             explosion.className = 'explosion';
-            explosion.style.left = (x - 30) + 'px';
-            explosion.style.top = (y - 30) + 'px';
-            sea.appendChild(explosion);
-            setTimeout(() => explosion.remove(), 300);
+            explosion.style.left = (x - 40) + 'px';
+            explosion.style.top = (y - 40) + 'px';
+            document.querySelector('.game-container').appendChild(explosion);
+            setTimeout(() => explosion.remove(), 400);
         }
 
         // 升级
@@ -724,11 +1020,15 @@
         function gameLoop() {
             if (!gameState.isPlaying) return;
             updateBoats();
+            updateBullets();
             requestAnimationFrame(gameLoop);
         }
 
         // 开始游戏
         function startGame() {
+            // 初始化音效
+            soundManager.init();
+
             // 获取难度
             const difficultyInput = document.querySelector('input[name="difficulty"]:checked');
             gameState.difficulty = difficultyInput.value;
@@ -740,6 +1040,7 @@
             gameState.level = 1;
             gameState.lives = 5;
             gameState.boats = [];
+            gameState.bullets = [];
             gameState.currentInput = '';
 
             scoreEl.textContent = '0';
@@ -747,8 +1048,10 @@
             updateLivesDisplay();
             inputCodeEl.textContent = '_';
 
-            // 清除旧船只
-            sea.querySelectorAll('.boat').forEach(b => b.remove());
+            // 清除旧船只和子弹
+            gameArea.querySelectorAll('.boat').forEach(b => b.remove());
+            document.querySelectorAll('.bullet').forEach(b => b.remove());
+            document.querySelectorAll('.explosion').forEach(e => e.remove());
 
             // 隐藏界面
             startScreen.classList.add('hidden');
@@ -773,7 +1076,8 @@
         // 键盘事件
         document.addEventListener('keydown', (e) => {
             if (!gameState.isPlaying) {
-                if (e.key === 'Enter') {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
                     if (!startScreen.classList.contains('hidden')) {
                         startGame();
                     } else if (!gameOverScreen.classList.contains('hidden')) {
@@ -783,9 +1087,11 @@
                 return;
             }
 
-            if (e.key === 'Enter') {
+            if (e.key === ' ') {
+                e.preventDefault(); // 防止页面滚动
                 checkInput();
             } else if (e.key === 'Backspace') {
+                e.preventDefault();
                 gameState.currentInput = gameState.currentInput.slice(0, -1);
                 inputCodeEl.textContent = gameState.currentInput || '_';
             } else if (/^[a-zA-Z]$/.test(e.key) && gameState.currentInput.length < 4) {
