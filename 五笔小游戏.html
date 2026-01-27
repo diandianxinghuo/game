@@ -975,7 +975,7 @@
             const fromLeft = targetBoat.x > 400;
             const startX = fromLeft ? 40 : 760;
             // 目标位置需要加上 game-area 的偏移
-            const targetY = targetBoat.y + gameAreaOffset + 40; // 船只中心位置
+            const targetY = targetBoat.y + gameAreaOffset + 20; // 船只中心位置
             const startY = targetY; // 子弹从目标同一高度发射
             
             const bullet = document.createElement('div');
