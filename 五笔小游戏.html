@@ -969,22 +969,27 @@
         }
 
         // 创建子弹
+        // 注意：game-area 有 50px 的顶部偏移，船只位置是相对于 game-area 的
         function createBullet(targetBoat) {
+            const gameAreaOffset = 50; // game-area 的 top 偏移
             const fromLeft = targetBoat.x > 400;
             const startX = fromLeft ? 40 : 760;
-            const startY = targetBoat.y + 90;
+            // 目标位置需要加上 game-area 的偏移
+            const targetY = targetBoat.y + gameAreaOffset + 40; // 船只中心位置
+            const startY = targetY; // 子弹从目标同一高度发射
             
             const bullet = document.createElement('div');
             bullet.className = 'bullet' + (fromLeft ? '' : ' left');
             bullet.style.left = startX + 'px';
             bullet.style.top = startY + 'px';
 
+            // 更新炮台位置
             if (fromLeft) {
-                cannonLeft.style.top = (startY + 50) + 'px';
+                cannonLeft.style.top = startY + 'px';
                 cannonLeft.classList.add('firing');
                 setTimeout(() => cannonLeft.classList.remove('firing'), 100);
             } else {
-                cannonRight.style.top = (startY + 50) + 'px';
+                cannonRight.style.top = startY + 'px';
                 cannonRight.classList.add('firing');
                 setTimeout(() => cannonRight.classList.remove('firing'), 100);
             }
@@ -993,8 +998,8 @@
                 element: bullet,
                 x: startX,
                 y: startY,
-                targetX: targetBoat.x + 50,
-                targetY: targetBoat.y + 40,
+                targetX: targetBoat.x + 50, // 船只中心 X
+                targetY: targetY,
                 targetBoat: targetBoat,
                 speed: 15,
                 fromLeft: fromLeft
@@ -1035,7 +1040,8 @@
             const index = gameState.boats.indexOf(boat);
             if (index === -1) return;
 
-            createExplosion(boat.x + 50, boat.y + 90);
+            const gameAreaOffset = 50; // game-area 的 top 偏移
+            createExplosion(boat.x + 50, boat.y + gameAreaOffset + 40);
             soundManager.playExplosion();
 
             boat.element.classList.add('sinking');
