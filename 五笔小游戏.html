@@ -420,18 +420,33 @@
             position: absolute;
             bottom: 80px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.85);
             color: #fff;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             font-size: 14px;
             z-index: 100;
-            max-width: 200px;
+            border: 2px solid #ffd700;
         }
 
         .hint-panel h3 {
             color: #ffd700;
             margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .hint-panel img {
+            display: block;
+            max-width: 180px;
+            height: auto;
+            image-rendering: pixelated;
+            border-radius: 3px;
+        }
+
+        .hint-panel .hint-text {
+            font-size: 12px;
+            color: #aaa;
+            text-align: center;
         }
 
         /* 爆炸效果 */
@@ -596,8 +611,8 @@
 
         <!-- 字根提示 -->
         <div class="hint-panel" id="hintPanel">
-            <h3>💡 提示</h3>
-            <div id="hintContent">输入字根对应的五笔键位击沉船只！</div>
+            <h3>💡 字根口诀</h3>
+            <div id="hintContent"><span class="hint-text">输入键位查看口诀</span></div>
         </div>
 
         <!-- 开始界面 -->
@@ -1224,13 +1239,17 @@
             }
         });
 
-        // 更新提示
+        // 更新提示 - 使用口诀图片
         function updateHint() {
             const key = gameState.currentInput.toUpperCase();
-            if (key && wubiTextData[key]) {
-                hintContent.textContent = `${key}键字根: ${wubiTextData[key].join('、')}`;
+            // 有效的五笔键位 (A-Y, 不包括Z)
+            const validKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXY';
+            
+            if (key && validKeys.includes(key)) {
+                // 显示对应键位的口诀图片
+                hintContent.innerHTML = `<img src="wubi_slogan/${key}.png" alt="${key}键口诀">`;
             } else {
-                hintContent.textContent = '输入字根对应的五笔键位击沉船只！';
+                hintContent.innerHTML = '<span class="hint-text">输入键位查看口诀</span>';
             }
         }
 
