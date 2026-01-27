@@ -608,8 +608,8 @@
             
             <div class="image-mode-toggle">
                 <label>
-                    <input type="checkbox" id="useImageMode"> 
-                    使用图片字根模式（需要先添加字根图片）
+                    <input type="checkbox" id="useImageMode" checked> 
+                    使用图片字根模式
                 </label>
             </div>
             
@@ -758,8 +758,8 @@
         };
 
         // 图片模式的字根配置
-        // 每个键对应的字根图片数量，图片命名格式: radicals/键位_序号.png
-        // 例如: radicals/G_1.png, radicals/G_2.png, ...
+        // 每个键对应的字根图片数量，图片命名格式: wubi_roots/键位序号.png
+        // 例如: wubi_roots/G1.png, wubi_roots/G2.png, ...
         const wubiImageData = {
             'G': { count: 0, loaded: [] },  // 11 王一五戋
             'F': { count: 0, loaded: [] },  // 12 土士二干十寸雨
@@ -863,7 +863,7 @@
                 
                 // 尝试加载每个键的图片，最多检测20张
                 for (let i = 1; i <= 20; i++) {
-                    const imgPath = `radicals/${key}_${i}.png`;
+                    const imgPath = `wubi_roots/${key}${i}.png`;
                     const exists = await checkImageExists(imgPath);
                     if (exists) {
                         keyData.loaded.push(imgPath);
