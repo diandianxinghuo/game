@@ -878,7 +878,7 @@
                 
                 // 尝试加载每个键的图片，最多检测20张
                 for (let i = 1; i <= 20; i++) {
-                    const imgPath = `roots/${key}${i}.png`;
+                    const imgPath = `wubi_roots/${key}${i}.png`;
                     const exists = await checkImageExists(imgPath);
                     if (exists) {
                         keyData.loaded.push(imgPath);
@@ -1247,7 +1247,7 @@
             
             if (key && validKeys.includes(key)) {
                 // 显示对应键位的口诀图片
-                hintContent.innerHTML = `<img src="slogan/${key}.png" alt="${key}键口诀">`;
+                hintContent.innerHTML = `<img src="wubi_slogan/${key}.png" alt="${key}键口诀">`;
             } else {
                 hintContent.innerHTML = '<span class="hint-text">输入键位查看口诀</span>';
             }
