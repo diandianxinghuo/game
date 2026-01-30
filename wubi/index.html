@@ -392,16 +392,16 @@
             transform: scale(1.1);
         }
 
-        .difficulty-select, .mode-select {
+        .mode-select {
             margin: 15px 0;
         }
 
-        .difficulty-select label, .mode-select label {
+        .mode-select label {
             margin: 0 10px;
             cursor: pointer;
         }
 
-        .difficulty-select input[type="radio"], .mode-select input[type="radio"] {
+        .mode-select input[type="radio"] {
             margin-right: 5px;
         }
 
@@ -410,6 +410,7 @@
             justify-content: center;
             gap: 15px;
             flex-wrap: wrap;
+            margin: 15px 0;
         }
 
         .mode-btn {
@@ -421,7 +422,7 @@
             cursor: pointer;
             color: #fff;
             transition: all 0.3s;
-            min-width: 120px;
+            min-width: 140px;
         }
 
         .mode-btn:hover {
@@ -444,6 +445,147 @@
         .mode-btn .mode-desc {
             font-size: 12px;
             opacity: 0.8;
+        }
+
+        .category-select {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 20px 30px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #4a9eff;
+            border-radius: 15px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.3s;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .category-btn:hover {
+            background: rgba(74, 158, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .category-btn.selected {
+            background: linear-gradient(to bottom, #4a9eff, #2070cc);
+            color: #fff;
+            font-weight: bold;
+            border-color: #fff;
+        }
+
+        .category-btn .category-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .category-btn .category-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .difficulty-select {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .diff-btn {
+            padding: 10px 25px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #32cd32;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .diff-btn:hover {
+            background: rgba(50, 205, 50, 0.2);
+        }
+
+        .diff-btn.selected {
+            background: linear-gradient(to bottom, #32cd32, #228b22);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .diff-btn[data-diff="normal"] {
+            border-color: #ffa500;
+        }
+
+        .diff-btn[data-diff="normal"]:hover {
+            background: rgba(255, 165, 0, 0.2);
+        }
+
+        .diff-btn[data-diff="normal"].selected {
+            background: linear-gradient(to bottom, #ffa500, #cc8400);
+        }
+
+        .diff-btn[data-diff="hard"] {
+            border-color: #ff4444;
+        }
+
+        .diff-btn[data-diff="hard"]:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        .diff-btn[data-diff="hard"].selected {
+            background: linear-gradient(to bottom, #ff4444, #cc0000);
+        }
+
+        /* 混合练习选项 */
+        .mix-options {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+        }
+
+        .mix-checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mix-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 2px solid #9b59b6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .mix-checkbox:hover {
+            background: rgba(155, 89, 182, 0.4);
+        }
+
+        .mix-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .mix-checkbox input[type="checkbox"]:checked + span {
+            color: #e74c3c;
+            font-weight: bold;
         }
 
         .section-title {
@@ -474,12 +616,16 @@
             font-size: 14px;
             z-index: 100;
             border: 2px solid #ffd700;
+            max-width: 280px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         .hint-panel h3 {
             color: #ffd700;
             margin-bottom: 5px;
             text-align: center;
+            font-size: 14px;
         }
 
         .hint-panel img {
@@ -491,9 +637,11 @@
         }
 
         .hint-panel .hint-text {
-            font-size: 12px;
+            font-size: 11px;
             color: #aaa;
-            text-align: center;
+            text-align: left;
+            line-height: 1.6;
+            word-break: break-all;
         }
 
         /* 爆炸效果 */
@@ -658,7 +806,7 @@
 
         <!-- 字根提示 -->
         <div class="hint-panel" id="hintPanel">
-            <h3>💡 字根口诀</h3>
+            <h3 id="hintTitle">💡 字根口诀</h3>
             <div id="hintContent"><span class="hint-text">输入键位查看口诀</span></div>
         </div>
 
@@ -668,20 +816,61 @@
             <p>经典小霸王游戏复刻版</p>
             <p>输入船帆上汉字的五笔编码来击沉船只</p>
             
-            <div class="image-mode-toggle">
+            <div class="section-title">选择练习类型</div>
+            <div class="category-select" id="categorySelect">
+                <div class="category-btn selected" data-category="roots">
+                    <div class="category-title">字根练习</div>
+                    <div class="category-desc">练习五笔基本字根</div>
+                </div>
+                <div class="category-btn" data-category="first">
+                    <div class="category-title">一级简码</div>
+                    <div class="category-desc">25个高频字，单键输入</div>
+                </div>
+                <div class="category-btn" data-category="second">
+                    <div class="category-title">二级简码</div>
+                    <div class="category-desc">常用字，双键输入</div>
+                </div>
+                <div class="category-btn" data-category="mixed">
+                    <div class="category-title">混合练习</div>
+                    <div class="category-desc">自定义混合内容</div>
+                </div>
+            </div>
+
+            <!-- 混合练习选项 -->
+            <div class="mix-options" id="mixOptions" style="display: none;">
+                <div class="section-title">选择要混合的内容（至少选一项）</div>
+                <div class="mix-checkboxes">
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixRoots" checked>
+                        <span>字根</span>
+                    </label>
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixFirst" checked>
+                        <span>一级简码</span>
+                    </label>
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixSecond" checked>
+                        <span>二级简码</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="section-title">选择难度</div>
+            <div class="difficulty-select" id="difficultySelect">
+                <div class="diff-btn selected" data-diff="easy">简单</div>
+                <div class="diff-btn" data-diff="normal">普通</div>
+                <div class="diff-btn" data-diff="hard">困难</div>
+            </div>
+
+            <div class="image-mode-toggle" id="imageModeToggle">
                 <label>
                     <input type="checkbox" id="useImageMode" checked> 
                     使用图片字根模式
                 </label>
             </div>
-            
-            <div class="difficulty-select">
-                <label><input type="radio" name="difficulty" value="easy" checked> 简单</label>
-                <label><input type="radio" name="difficulty" value="normal"> 普通</label>
-                <label><input type="radio" name="difficulty" value="hard"> 困难</label>
-            </div>
+
             <button class="btn" id="startBtn">开始游戏</button>
-            <p style="margin-top: 30px; font-size: 14px;">提示：使用键盘输入五笔编码，空格键确认发射</p>
+            <p style="margin-top: 20px; font-size: 14px;">提示：使用键盘输入五笔编码，空格键确认发射</p>
             <div class="loading-info" id="loadingInfo"></div>
         </div>
 
@@ -819,6 +1008,239 @@
             'X': ['弓', '匕', '母']
         };
 
+        // 一级简码数据 (单键)
+        const firstCodeData = [
+            { code: 'G', char: '一' },
+            { code: 'F', char: '地' },
+            { code: 'D', char: '在' },
+            { code: 'S', char: '要' },
+            { code: 'A', char: '工' },
+            { code: 'H', char: '上' },
+            { code: 'J', char: '是' },
+            { code: 'K', char: '中' },
+            { code: 'L', char: '国' },
+            { code: 'M', char: '同' },
+            { code: 'T', char: '和' },
+            { code: 'R', char: '的' },
+            { code: 'E', char: '有' },
+            { code: 'W', char: '人' },
+            { code: 'Q', char: '我' },
+            { code: 'Y', char: '主' },
+            { code: 'U', char: '产' },
+            { code: 'I', char: '不' },
+            { code: 'O', char: '为' },
+            { code: 'P', char: '这' },
+            { code: 'N', char: '民' },
+            { code: 'B', char: '了' },
+            { code: 'V', char: '发' },
+            { code: 'C', char: '以' },
+            { code: 'X', char: '经' }
+        ];
+
+        // 二级简码数据 (双键)
+        const secondCodeData = [
+            // G 区
+            { code: 'GA', char: '开' }, { code: 'GD', char: '于' }, { code: 'GF', char: '天' },
+            { code: 'GG', char: '五' }, { code: 'GH', char: '下' }, { code: 'GJ', char: '理' },
+            { code: 'GK', char: '事' }, { code: 'GM', char: '现' }, { code: 'GN', char: '画' },
+            { code: 'GP', char: '与' }, { code: 'GQ', char: '来' }, { code: 'GR', char: '列' },
+            { code: 'GS', char: '珠' }, { code: 'GT', char: '末' }, { code: 'GU', char: '玫' },
+            { code: 'GW', char: '平' }, { code: 'GX', char: '妻' }, { code: 'GY', char: '珍' },
+            { code: 'GB', char: '互' }, { code: 'GC', char: '玉' },
+            // F 区
+            { code: 'FA', char: '载' }, { code: 'FD', char: '城' }, { code: 'FF', char: '寺' },
+            { code: 'FG', char: '二' }, { code: 'FH', char: '直' }, { code: 'FJ', char: '示' },
+            { code: 'FK', char: '进' }, { code: 'FM', char: '吉' }, { code: 'FN', char: '协' },
+            { code: 'FP', char: '南' }, { code: 'FQ', char: '志' }, { code: 'FR', char: '赤' },
+            { code: 'FS', char: '过' }, { code: 'FT', char: '无' }, { code: 'FU', char: '垢' },
+            { code: 'FV', char: '霜' }, { code: 'FW', char: '才' }, { code: 'FX', char: '增' },
+            { code: 'FY', char: '雪' }, { code: 'FB', char: '夫' }, { code: 'FC', char: '坟' },
+            // D 区
+            { code: 'DA', char: '左' }, { code: 'DD', char: '顾' }, { code: 'DF', char: '大' },
+            { code: 'DG', char: '友' }, { code: 'DH', char: '右' }, { code: 'DJ', char: '丰' },
+            { code: 'DK', char: '历' }, { code: 'DM', char: '面' }, { code: 'DN', char: '帮' },
+            { code: 'DP', char: '原' }, { code: 'DQ', char: '胡' }, { code: 'DR', char: '春' },
+            { code: 'DS', char: '克' }, { code: 'DT', char: '太' }, { code: 'DU', char: '磁' },
+            { code: 'DV', char: '砂' }, { code: 'DW', char: '灰' }, { code: 'DX', char: '达' },
+            { code: 'DY', char: '成' }, { code: 'DB', char: '肆' }, { code: 'DC', char: '龙' },
+            // S 区
+            { code: 'SA', char: '械' }, { code: 'SD', char: '权' }, { code: 'SF', char: '本' },
+            { code: 'SG', char: '村' }, { code: 'SH', char: '枯' }, { code: 'SJ', char: '林' },
+            { code: 'SK', char: '革' }, { code: 'SM', char: '式' }, { code: 'SN', char: '格' },
+            { code: 'SP', char: '样' }, { code: 'SQ', char: '检' }, { code: 'SR', char: '标' },
+            { code: 'SS', char: '木' }, { code: 'ST', char: '杨' }, { code: 'SU', char: '李' },
+            { code: 'SV', char: '要' }, { code: 'SW', char: '权' }, { code: 'SX', char: '楷' },
+            { code: 'SY', char: '七' }, { code: 'SB', char: '革' }, { code: 'SC', char: '基' },
+            // A 区
+            { code: 'AA', char: '式' }, { code: 'AD', char: '功' }, { code: 'AF', char: '攻' },
+            { code: 'AG', char: '匠' }, { code: 'AH', char: '菜' }, { code: 'AJ', char: '共' },
+            { code: 'AK', char: '区' }, { code: 'AM', char: '芳' }, { code: 'AN', char: '燕' },
+            { code: 'AP', char: '东' }, { code: 'AQ', char: '芝' }, { code: 'AR', char: '世' },
+            { code: 'AS', char: '节' }, { code: 'AT', char: '切' }, { code: 'AU', char: '芭' },
+            { code: 'AV', char: '药' }, { code: 'AW', char: '睛' }, { code: 'AX', char: '睦' },
+            { code: 'AY', char: '盯' }, { code: 'AB', char: '虎' }, { code: 'AC', char: '止' },
+            // H 区
+            { code: 'HA', char: '皮' }, { code: 'HD', char: '睛' }, { code: 'HF', char: '盯' },
+            { code: 'HG', char: '步' }, { code: 'HH', char: '睡' }, { code: 'HJ', char: '肯' },
+            { code: 'HK', char: '餐' }, { code: 'HM', char: '量' }, { code: 'HN', char: '时' },
+            { code: 'HP', char: '晨' }, { code: 'HQ', char: '果' }, { code: 'HR', char: '虹' },
+            { code: 'HS', char: '早' }, { code: 'HT', char: '昌' }, { code: 'HU', char: '蝇' },
+            { code: 'HV', char: '昨' }, { code: 'HW', char: '遇' }, { code: 'HX', char: '晚' },
+            { code: 'HY', char: '景' }, { code: 'HB', char: '暗' }, { code: 'HC', char: '晃' },
+            // J 区
+            { code: 'JA', char: '虹' }, { code: 'JD', char: '最' }, { code: 'JF', char: '晨' },
+            { code: 'JG', char: '量' }, { code: 'JH', char: '时' }, { code: 'JJ', char: '昌' },
+            { code: 'JK', char: '蝇' }, { code: 'JM', char: '昨' }, { code: 'JN', char: '遇' },
+            { code: 'JP', char: '晚' }, { code: 'JQ', char: '景' }, { code: 'JR', char: '暗' },
+            { code: 'JS', char: '晃' }, { code: 'JT', char: '显' }, { code: 'JU', char: '晕' },
+            { code: 'JV', char: '电' }, { code: 'JW', char: '最' }, { code: 'JX', char: '归' },
+            { code: 'JY', char: '紧' }, { code: 'JB', char: '昆' }, { code: 'JC', char: '呈' },
+            // K 区
+            { code: 'KA', char: '呀' }, { code: 'KD', char: '吧' }, { code: 'KF', char: '顺' },
+            { code: 'KG', char: '吸' }, { code: 'KH', char: '叶' }, { code: 'KJ', char: '呈' },
+            { code: 'KK', char: '中' }, { code: 'KM', char: '虽' }, { code: 'KN', char: '吕' },
+            { code: 'KP', char: '另' }, { code: 'KQ', char: '员' }, { code: 'KR', char: '叫' },
+            { code: 'KS', char: '咖' }, { code: 'KT', char: '吧' }, { code: 'KU', char: '电' },
+            { code: 'KV', char: '边' }, { code: 'KW', char: '另' }, { code: 'KX', char: '罗' },
+            { code: 'KY', char: '力' }, { code: 'KB', char: '较' }, { code: 'KC', char: '嘛' },
+            // L 区
+            { code: 'LA', char: '轻' }, { code: 'LD', char: '因' }, { code: 'LF', char: '胃' },
+            { code: 'LG', char: '轩' }, { code: 'LH', char: '车' }, { code: 'LJ', char: '四' },
+            { code: 'LK', char: '辊' }, { code: 'LM', char: '加' }, { code: 'LN', char: '男' },
+            { code: 'LP', char: '轴' }, { code: 'LQ', char: '思' }, { code: 'LR', char: '辚' },
+            { code: 'LS', char: '边' }, { code: 'LT', char: '罗' }, { code: 'LU', char: '斩' },
+            { code: 'LV', char: '困' }, { code: 'LW', char: '力' }, { code: 'LX', char: '较' },
+            { code: 'LY', char: '轨' }, { code: 'LB', char: '办' }, { code: 'LC', char: '累' },
+            // M 区
+            { code: 'MA', char: '曲' }, { code: 'MD', char: '邮' }, { code: 'MF', char: '凤' },
+            { code: 'MG', char: '央' }, { code: 'MH', char: '骨' }, { code: 'MJ', char: '财' },
+            { code: 'MK', char: '同' }, { code: 'MM', char: '由' }, { code: 'MN', char: '峭' },
+            { code: 'MP', char: '则' }, { code: 'MQ', char: '崭' }, { code: 'MR', char: '册' },
+            { code: 'MS', char: '岂' }, { code: 'MT', char: '迪' }, { code: 'MU', char: '风' },
+            { code: 'MV', char: '贩' }, { code: 'MW', char: '朵' }, { code: 'MX', char: '几' },
+            { code: 'MY', char: '赠' }, { code: 'MB', char: '内' }, { code: 'MC', char: '凡' },
+            // T 区
+            { code: 'TA', char: '长' }, { code: 'TD', char: '季' }, { code: 'TF', char: '么' },
+            { code: 'TG', char: '知' }, { code: 'TH', char: '秀' }, { code: 'TJ', char: '行' },
+            { code: 'TK', char: '生' }, { code: 'TM', char: '处' }, { code: 'TN', char: '秒' },
+            { code: 'TP', char: '得' }, { code: 'TQ', char: '各' }, { code: 'TR', char: '务' },
+            { code: 'TS', char: '向' }, { code: 'TT', char: '秘' }, { code: 'TU', char: '秋' },
+            { code: 'TV', char: '管' }, { code: 'TW', char: '称' }, { code: 'TX', char: '第' },
+            { code: 'TY', char: '科' }, { code: 'TB', char: '委' }, { code: 'TC', char: '答' },
+            // R 区
+            { code: 'RA', char: '找' }, { code: 'RD', char: '报' }, { code: 'RF', char: '反' },
+            { code: 'RG', char: '拓' }, { code: 'RH', char: '扔' }, { code: 'RJ', char: '持' },
+            { code: 'RK', char: '后' }, { code: 'RM', char: '年' }, { code: 'RN', char: '朱' },
+            { code: 'RP', char: '提' }, { code: 'RQ', char: '扣' }, { code: 'RR', char: '押' },
+            { code: 'RS', char: '抽' }, { code: 'RT', char: '所' }, { code: 'RU', char: '搂' },
+            { code: 'RV', char: '近' }, { code: 'RW', char: '换' }, { code: 'RX', char: '折' },
+            { code: 'RY', char: '打' }, { code: 'RB', char: '手' }, { code: 'RC', char: '拉' },
+            // E 区
+            { code: 'EA', char: '肛' }, { code: 'ED', char: '服' }, { code: 'EF', char: '肥' },
+            { code: 'EG', char: '须' }, { code: 'EH', char: '朋' }, { code: 'EJ', char: '肝' },
+            { code: 'EK', char: '且' }, { code: 'EM', char: '膛' }, { code: 'EN', char: '胆' },
+            { code: 'EP', char: '肿' }, { code: 'EQ', char: '肋' }, { code: 'ER', char: '肌' },
+            { code: 'ES', char: '甩' }, { code: 'ET', char: '膦' }, { code: 'EU', char: '爱' },
+            { code: 'EV', char: '胸' }, { code: 'EW', char: '遥' }, { code: 'EX', char: '采' },
+            { code: 'EY', char: '用' }, { code: 'EB', char: '妥' }, { code: 'EC', char: '脸' },
+            // W 区
+            { code: 'WA', char: '代' }, { code: 'WD', char: '他' }, { code: 'WF', char: '公' },
+            { code: 'WG', char: '估' }, { code: 'WH', char: '仍' }, { code: 'WJ', char: '会' },
+            { code: 'WK', char: '全' }, { code: 'WM', char: '个' }, { code: 'WN', char: '偿' },
+            { code: 'WP', char: '介' }, { code: 'WQ', char: '保' }, { code: 'WR', char: '佃' },
+            { code: 'WS', char: '仙' }, { code: 'WT', char: '作' }, { code: 'WU', char: '伯' },
+            { code: 'WV', char: '们' }, { code: 'WW', char: '从' }, { code: 'WX', char: '你' },
+            { code: 'WY', char: '信' }, { code: 'WB', char: '们' }, { code: 'WC', char: '的' },
+            // Q 区
+            { code: 'QA', char: '氏' }, { code: 'QD', char: '凶' }, { code: 'QF', char: '色' },
+            { code: 'QG', char: '然' }, { code: 'QH', char: '角' }, { code: 'QJ', char: '针' },
+            { code: 'QK', char: '钱' }, { code: 'QM', char: '外' }, { code: 'QN', char: '乐' },
+            { code: 'QP', char: '旬' }, { code: 'QQ', char: '名' }, { code: 'QR', char: '甸' },
+            { code: 'QS', char: '负' }, { code: 'QT', char: '包' }, { code: 'QU', char: '炙' },
+            { code: 'QV', char: '锭' }, { code: 'QW', char: '多' }, { code: 'QX', char: '铁' },
+            { code: 'QY', char: '钉' }, { code: 'QB', char: '儿' }, { code: 'QC', char: '匀' },
+            // Y 区
+            { code: 'YA', char: '度' }, { code: 'YD', char: '离' }, { code: 'YF', char: '充' },
+            { code: 'YG', char: '庆' }, { code: 'YH', char: '衣' }, { code: 'YJ', char: '计' },
+            { code: 'YK', char: '主' }, { code: 'YM', char: '让' }, { code: 'YN', char: '就' },
+            { code: 'YP', char: '刘' }, { code: 'YQ', char: '训' }, { code: 'YR', char: '为' },
+            { code: 'YS', char: '高' }, { code: 'YT', char: '记' }, { code: 'YU', char: '变' },
+            { code: 'YV', char: '这' }, { code: 'YW', char: '义' }, { code: 'YX', char: '诉' },
+            { code: 'YY', char: '订' }, { code: 'YB', char: '放' }, { code: 'YC', char: '说' },
+            // U 区
+            { code: 'UA', char: '并' }, { code: 'UD', char: '闻' }, { code: 'UF', char: '冯' },
+            { code: 'UG', char: '关' }, { code: 'UH', char: '前' }, { code: 'UJ', char: '半' },
+            { code: 'UK', char: '闫' }, { code: 'UM', char: '站' }, { code: 'UN', char: '冰' },
+            { code: 'UP', char: '间' }, { code: 'UQ', char: '部' }, { code: 'UR', char: '曾' },
+            { code: 'US', char: '商' }, { code: 'UT', char: '决' }, { code: 'UU', char: '普' },
+            { code: 'UV', char: '帝' }, { code: 'UW', char: '交' }, { code: 'UX', char: '瓣' },
+            { code: 'UY', char: '亲' }, { code: 'UB', char: '产' }, { code: 'UC', char: '立' },
+            // I 区
+            { code: 'IA', char: '江' }, { code: 'ID', char: '池' }, { code: 'IF', char: '汉' },
+            { code: 'IG', char: '尖' }, { code: 'IH', char: '肖' }, { code: 'IJ', char: '法' },
+            { code: 'IK', char: '汪' }, { code: 'IM', char: '小' }, { code: 'IN', char: '水' },
+            { code: 'IP', char: '浊' }, { code: 'IQ', char: '澡' }, { code: 'IR', char: '渐' },
+            { code: 'IS', char: '没' }, { code: 'IT', char: '沁' }, { code: 'IU', char: '淡' },
+            { code: 'IV', char: '学' }, { code: 'IW', char: '光' }, { code: 'IX', char: '泊' },
+            { code: 'IY', char: '酒' }, { code: 'IB', char: '少' }, { code: 'IC', char: '洋' },
+            // O 区
+            { code: 'OA', char: '煤' }, { code: 'OD', char: '籽' }, { code: 'OF', char: '烃' },
+            { code: 'OG', char: '类' }, { code: 'OH', char: '粗' }, { code: 'OJ', char: '灶' },
+            { code: 'OK', char: '业' }, { code: 'OM', char: '粘' }, { code: 'ON', char: '炒' },
+            { code: 'OP', char: '烛' }, { code: 'OQ', char: '炽' }, { code: 'OR', char: '烟' },
+            { code: 'OS', char: '灿' }, { code: 'OT', char: '烽' }, { code: 'OU', char: '煌' },
+            { code: 'OV', char: '灯' }, { code: 'OW', char: '料' }, { code: 'OX', char: '断' },
+            { code: 'OY', char: '籽' }, { code: 'OB', char: '娄' }, { code: 'OC', char: '烃' },
+            // P 区
+            { code: 'PA', char: '定' }, { code: 'PD', char: '守' }, { code: 'PF', char: '害' },
+            { code: 'PG', char: '宁' }, { code: 'PH', char: '宽' }, { code: 'PJ', char: '寂' },
+            { code: 'PK', char: '审' }, { code: 'PM', char: '宫' }, { code: 'PN', char: '军' },
+            { code: 'PP', char: '宙' }, { code: 'PQ', char: '客' }, { code: 'PR', char: '宾' },
+            { code: 'PS', char: '家' }, { code: 'PT', char: '空' }, { code: 'PU', char: '宛' },
+            { code: 'PV', char: '社' }, { code: 'PW', char: '实' }, { code: 'PX', char: '宵' },
+            { code: 'PY', char: '灾' }, { code: 'PB', char: '之' }, { code: 'PC', char: '官' },
+            // N 区
+            { code: 'NA', char: '民' }, { code: 'ND', char: '敢' }, { code: 'NF', char: '怪' },
+            { code: 'NG', char: '居' }, { code: 'NH', char: '导' }, { code: 'NJ', char: '怀' },
+            { code: 'NK', char: '收' }, { code: 'NM', char: '悄' }, { code: 'NN', char: '慢' },
+            { code: 'NP', char: '避' }, { code: 'NQ', char: '惭' }, { code: 'NR', char: '届' },
+            { code: 'NS', char: '忆' }, { code: 'NT', char: '屡' }, { code: 'NU', char: '忧' },
+            { code: 'NV', char: '懈' }, { code: 'NW', char: '怕' }, { code: 'NX', char: '必' },
+            { code: 'NY', char: '习' }, { code: 'NB', char: '恨' }, { code: 'NC', char: '愉' },
+            // B 区
+            { code: 'BA', char: '陈' }, { code: 'BD', char: '子' }, { code: 'BF', char: '取' },
+            { code: 'BG', char: '承' }, { code: 'BH', char: '阴' }, { code: 'BJ', char: '际' },
+            { code: 'BK', char: '卫' }, { code: 'BM', char: '耻' }, { code: 'BN', char: '孙' },
+            { code: 'BP', char: '阳' }, { code: 'BQ', char: '职' }, { code: 'BR', char: '阵' },
+            { code: 'BS', char: '出' }, { code: 'BT', char: '也' }, { code: 'BU', char: '耿' },
+            { code: 'BV', char: '辽' }, { code: 'BW', char: '隐' }, { code: 'BX', char: '孤' },
+            { code: 'BY', char: '阿' }, { code: 'BB', char: '降' }, { code: 'BC', char: '联' },
+            // V 区
+            { code: 'VA', char: '姨' }, { code: 'VD', char: '寻' }, { code: 'VF', char: '姑' },
+            { code: 'VG', char: '杂' }, { code: 'VH', char: '毁' }, { code: 'VJ', char: '旭' },
+            { code: 'VK', char: '如' }, { code: 'VM', char: '舅' }, { code: 'VN', char: '妗' },
+            { code: 'VP', char: '刀' }, { code: 'VQ', char: '灵' }, { code: 'VR', char: '巡' },
+            { code: 'VS', char: '婚' }, { code: 'VT', char: '妨' }, { code: 'VU', char: '嫌' },
+            { code: 'VV', char: '录' }, { code: 'VW', char: '巢' }, { code: 'VX', char: '姹' },
+            { code: 'VY', char: '好' }, { code: 'VB', char: '妈' }, { code: 'VC', char: '参' },
+            // C 区
+            { code: 'CA', char: '戏' }, { code: 'CD', char: '邓' }, { code: 'CF', char: '双' },
+            { code: 'CG', char: '参' }, { code: 'CH', char: '能' }, { code: 'CJ', char: '对' },
+            { code: 'CK', char: '骊' }, { code: 'CM', char: '台' }, { code: 'CN', char: '劝' },
+            { code: 'CP', char: '观' }, { code: 'CQ', char: '矣' }, { code: 'CR', char: '牟' },
+            { code: 'CS', char: '难' }, { code: 'CT', char: '允' }, { code: 'CU', char: '驻' },
+            { code: 'CV', char: '骈' }, { code: 'CW', char: '驼' }, { code: 'CX', char: '马' },
+            { code: 'CY', char: '邓' }, { code: 'CB', char: '艰' }, { code: 'CC', char: '双' },
+            // X 区
+            { code: 'XA', char: '线' }, { code: 'XD', char: '结' }, { code: 'XF', char: '顷' },
+            { code: 'XG', char: '红' }, { code: 'XH', char: '引' }, { code: 'XJ', char: '旨' },
+            { code: 'XK', char: '强' }, { code: 'XM', char: '细' }, { code: 'XN', char: '纲' },
+            { code: 'XP', char: '纪' }, { code: 'XQ', char: '驰' }, { code: 'XR', char: '绿' },
+            { code: 'XS', char: '经' }, { code: 'XT', char: '比' }, { code: 'XU', char: '纺' },
+            { code: 'XV', char: '弱' }, { code: 'XW', char: '纱' }, { code: 'XX', char: '继' },
+            { code: 'XY', char: '综' }, { code: 'XB', char: '纪' }, { code: 'XC', char: '级' }
+        ];
+
         // 图片模式的字根配置
         // 每个键对应的字根图片数量，图片命名格式: wubi_roots/键位序号.png
         // 例如: wubi_roots/G1.png, wubi_roots/G2.png, ...
@@ -854,7 +1276,13 @@
         let gameConfig = {
             useImageMode: false,
             imagesLoaded: false,
-            availableKeys: []  // 有可用字根的键位
+            availableKeys: [],  // 有可用字根的键位
+            category: 'roots',  // 当前类别: roots, first, second, mixed
+            mixedOptions: {     // 混合模式选项
+                roots: true,
+                first: true,
+                second: true
+            }
         };
 
         // 游戏状态
@@ -870,6 +1298,44 @@
             spawnInterval: null,
             gameLoop: null
         };
+
+        // 根据类别获取最大输入长度
+        function getMaxInputLength() {
+            switch(gameConfig.category) {
+                case 'first': return 1;
+                case 'second': return 2;
+                case 'mixed': return 4; // 混合模式需要支持最长的输入
+                default: return 4;
+            }
+        }
+
+        // 检查当前输入是否应该自动发射（混合模式）
+        function shouldAutoFire() {
+            if (gameConfig.category !== 'mixed') return false;
+            
+            const input = gameState.currentInput.toUpperCase();
+            
+            // 检查是否匹配一级简码
+            if (input.length === 1 && gameConfig.mixedOptions.first) {
+                const match = firstCodeData.find(item => item.code === input);
+                if (match) {
+                    // 检查是否有船只使用这个编码
+                    const boat = gameState.boats.find(b => b.key === input);
+                    if (boat) return true;
+                }
+            }
+            
+            // 检查是否匹配二级简码
+            if (input.length === 2 && gameConfig.mixedOptions.second) {
+                const match = secondCodeData.find(item => item.code === input);
+                if (match) {
+                    const boat = gameState.boats.find(b => b.key === input);
+                    if (boat) return true;
+                }
+            }
+            
+            return false;
+        }
 
         // 难度设置
         const difficultySettings = {
@@ -895,6 +1361,9 @@
         const cannonRight = document.getElementById('cannonRight');
         const loadingInfo = document.getElementById('loadingInfo');
         const useImageModeCheckbox = document.getElementById('useImageMode');
+        const imageModeToggle = document.getElementById('imageModeToggle');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const diffBtns = document.querySelectorAll('.diff-btn');
 
         // 船只颜色
         const boatColors = ['pink', 'green', 'brown', 'blue', 'orange'];
@@ -925,7 +1394,7 @@
                 
                 // 尝试加载每个键的图片，最多检测20张
                 for (let i = 1; i <= 20; i++) {
-                    const imgPath = `wubi_roots/${key}${i}.png`;
+                    const imgPath = `roots/${key}${i}.png`;
                     const exists = await checkImageExists(imgPath);
                     if (exists) {
                         keyData.loaded.push(imgPath);
@@ -963,8 +1432,8 @@
             });
         }
 
-        // 获取随机字根
-        function getRandomRadical() {
+        // 获取字根数据
+        function getRootsRadical() {
             if (gameConfig.useImageMode && gameConfig.imagesLoaded && gameConfig.availableKeys.length > 0) {
                 // 图片模式
                 const key = gameConfig.availableKeys[Math.floor(Math.random() * gameConfig.availableKeys.length)];
@@ -974,7 +1443,8 @@
                 return { 
                     key: key, 
                     display: `<img src="${imgPath}" alt="${key}">`,
-                    isImage: true
+                    isImage: true,
+                    type: 'roots'
                 };
             } else {
                 // 文字模式
@@ -985,8 +1455,67 @@
                 return { 
                     key: key, 
                     display: char,
-                    isImage: false
+                    isImage: false,
+                    type: 'roots'
                 };
+            }
+        }
+
+        // 获取一级简码数据
+        function getFirstCodeRadical() {
+            const firstItem = firstCodeData[Math.floor(Math.random() * firstCodeData.length)];
+            return {
+                key: firstItem.code,
+                display: firstItem.char,
+                isImage: false,
+                type: 'first'
+            };
+        }
+
+        // 获取二级简码数据
+        function getSecondCodeRadical() {
+            const secondItem = secondCodeData[Math.floor(Math.random() * secondCodeData.length)];
+            return {
+                key: secondItem.code,
+                display: secondItem.char,
+                isImage: false,
+                type: 'second'
+            };
+        }
+
+        // 获取随机字根/汉字
+        function getRandomRadical() {
+            // 根据类别选择不同的数据源
+            switch(gameConfig.category) {
+                case 'first':
+                    return getFirstCodeRadical();
+                
+                case 'second':
+                    return getSecondCodeRadical();
+                
+                case 'mixed':
+                    // 混合模式 - 根据选项随机选择
+                    const options = [];
+                    if (gameConfig.mixedOptions.roots) options.push('roots');
+                    if (gameConfig.mixedOptions.first) options.push('first');
+                    if (gameConfig.mixedOptions.second) options.push('second');
+                    
+                    if (options.length === 0) {
+                        // 如果没有选择任何选项，默认使用字根
+                        return getRootsRadical();
+                    }
+                    
+                    const selectedType = options[Math.floor(Math.random() * options.length)];
+                    switch(selectedType) {
+                        case 'roots': return getRootsRadical();
+                        case 'first': return getFirstCodeRadical();
+                        case 'second': return getSecondCodeRadical();
+                    }
+                    break;
+                
+                default:
+                    // 字根练习模式
+                    return getRootsRadical();
             }
         }
 
@@ -1020,6 +1549,7 @@
             const boatData = {
                 element: boat,
                 key: radical.key,
+                type: radical.type || 'roots',  // 保存类型用于混合模式自动发射
                 x: startX,
                 y: yPos,
                 direction: direction,
@@ -1217,12 +1747,32 @@
         function startGame() {
             soundManager.init();
 
-            const difficultyInput = document.querySelector('input[name="difficulty"]:checked');
-            gameState.difficulty = difficultyInput.value;
+            // 获取选中的难度
+            const selectedDiff = document.querySelector('.diff-btn.selected');
+            gameState.difficulty = selectedDiff ? selectedDiff.dataset.diff : 'easy';
             const settings = difficultySettings[gameState.difficulty];
 
-            // 检查图片模式
-            gameConfig.useImageMode = useImageModeCheckbox.checked;
+            // 获取选中的类别
+            const selectedCategory = document.querySelector('.category-btn.selected');
+            gameConfig.category = selectedCategory ? selectedCategory.dataset.category : 'roots';
+
+            // 如果是混合模式，读取混合选项
+            if (gameConfig.category === 'mixed') {
+                gameConfig.mixedOptions.roots = document.getElementById('mixRoots').checked;
+                gameConfig.mixedOptions.first = document.getElementById('mixFirst').checked;
+                gameConfig.mixedOptions.second = document.getElementById('mixSecond').checked;
+                
+                // 验证至少选择了一项
+                if (!gameConfig.mixedOptions.roots && !gameConfig.mixedOptions.first && !gameConfig.mixedOptions.second) {
+                    alert('请至少选择一种混合内容！');
+                    return;
+                }
+            }
+
+            // 检查图片模式（字根练习模式或混合模式包含字根时有效）
+            gameConfig.useImageMode = (gameConfig.category === 'roots' || 
+                (gameConfig.category === 'mixed' && gameConfig.mixedOptions.roots)) && 
+                useImageModeCheckbox.checked;
 
             gameState.isPlaying = true;
             gameState.score = 0;
@@ -1236,6 +1786,30 @@
             levelEl.textContent = '1';
             updateLivesDisplay();
             inputCodeEl.textContent = '_';
+            
+            // 更新输入提示文字和提示标题
+            const inputLabel = document.querySelector('.input-display .label');
+            const hintTitle = document.getElementById('hintTitle');
+            switch(gameConfig.category) {
+                case 'first':
+                    inputLabel.textContent = '输入一级简码（自动发射）：';
+                    hintTitle.textContent = '💡 一级简码';
+                    break;
+                case 'second':
+                    inputLabel.textContent = '输入二级简码（自动发射）：';
+                    hintTitle.textContent = '💡 二级简码';
+                    break;
+                case 'mixed':
+                    inputLabel.textContent = '输入编码（简码自动发射，字根空格确认）：';
+                    hintTitle.textContent = '💡 混合练习';
+                    break;
+                default:
+                    inputLabel.textContent = '输入五笔编码（空格确认）：';
+                    hintTitle.textContent = '💡 字根口诀';
+            }
+            
+            // 初始化提示内容
+            updateHint();
 
             gameArea.querySelectorAll('.boat').forEach(b => b.remove());
             document.querySelectorAll('.bullet').forEach(b => b.remove());
@@ -1279,30 +1853,142 @@
                 e.preventDefault();
                 gameState.currentInput = gameState.currentInput.slice(0, -1);
                 inputCodeEl.textContent = gameState.currentInput || '_';
-            } else if (/^[a-zA-Z]$/.test(e.key) && gameState.currentInput.length < 4) {
+            } else if (/^[a-zA-Z]$/.test(e.key) && gameState.currentInput.length < getMaxInputLength()) {
                 gameState.currentInput += e.key.toUpperCase();
                 inputCodeEl.textContent = gameState.currentInput;
                 updateHint();
+                
+                // 一级简码和二级简码自动发射
+                if ((gameConfig.category === 'first' && gameState.currentInput.length === 1) ||
+                    (gameConfig.category === 'second' && gameState.currentInput.length === 2)) {
+                    checkInput();
+                }
+                
+                // 混合模式：检查是否匹配船只并自动发射
+                if (gameConfig.category === 'mixed') {
+                    const input = gameState.currentInput;
+                    const matchingBoat = gameState.boats.find(b => b.key === input);
+                    if (matchingBoat) {
+                        // 检查是否是一级或二级简码类型的船
+                        if (matchingBoat.type === 'first' || matchingBoat.type === 'second') {
+                            checkInput();
+                        }
+                    }
+                }
             }
         });
 
         // 更新提示 - 使用口诀图片
         function updateHint() {
-            const key = gameState.currentInput.toUpperCase();
+            const input = gameState.currentInput.toUpperCase();
             // 有效的五笔键位 (A-Y, 不包括Z)
             const validKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXY';
             
-            if (key && validKeys.includes(key)) {
-                // 显示对应键位的口诀图片
-                hintContent.innerHTML = `<img src="slogan/${key}.png" alt="${key}键口诀">`;
-            } else {
-                hintContent.innerHTML = '<span class="hint-text">输入键位查看口诀</span>';
+            // 根据类别显示不同提示
+            switch(gameConfig.category) {
+                case 'first':
+                    // 一级简码 - 显示当前区域的一级简码
+                    if (input.length === 0) {
+                        const firstCodes = firstCodeData.map(item => `${item.code}=${item.char}`).join('  ');
+                        hintContent.innerHTML = `<span class="hint-text">一级简码表：<br>${firstCodes}</span>`;
+                    }
+                    break;
+                
+                case 'second':
+                    // 二级简码 - 显示当前区域的二级简码
+                    if (input.length === 1 && validKeys.includes(input)) {
+                        const codes = secondCodeData.filter(item => item.code.startsWith(input));
+                        const codesText = codes.map(item => `${item.code}=${item.char}`).join('  ');
+                        hintContent.innerHTML = `<span class="hint-text">${input}区二级简码：<br>${codesText}</span>`;
+                    } else {
+                        hintContent.innerHTML = '<span class="hint-text">输入首字母查看该区简码</span>';
+                    }
+                    break;
+                
+                case 'mixed':
+                    // 混合练习 - 显示当前选中的混合内容提示
+                    let mixInfo = [];
+                    if (gameConfig.mixedOptions.roots) mixInfo.push('字根');
+                    if (gameConfig.mixedOptions.first) mixInfo.push('一级简码');
+                    if (gameConfig.mixedOptions.second) mixInfo.push('二级简码');
+                    
+                    if (input && input.length === 1 && validKeys.includes(input)) {
+                        let hintHtml = '';
+                        // 显示对应键位的口诀
+                        if (gameConfig.mixedOptions.roots) {
+                            hintHtml += `<img src="slogan/${input}.png" alt="${input}键口诀" style="max-width:150px;"><br>`;
+                        }
+                        // 显示二级简码
+                        if (gameConfig.mixedOptions.second) {
+                            const codes = secondCodeData.filter(item => item.code.startsWith(input));
+                            const codesText = codes.slice(0, 10).map(item => `${item.code}=${item.char}`).join(' ');
+                            hintHtml += `<span class="hint-text">${input}区：${codesText}...</span>`;
+                        }
+                        hintContent.innerHTML = hintHtml || `<span class="hint-text">混合模式：${mixInfo.join(' + ')}</span>`;
+                    } else {
+                        hintContent.innerHTML = `<span class="hint-text">混合模式：${mixInfo.join(' + ')}<br>简码自动发射，字根按空格确认</span>`;
+                    }
+                    break;
+                
+                default:
+                    // 字根练习 - 显示口诀图片
+                    if (input && input.length === 1 && validKeys.includes(input)) {
+                        hintContent.innerHTML = `<img src="slogan/${input}.png" alt="${input}键口诀">`;
+                    } else {
+                        hintContent.innerHTML = '<span class="hint-text">输入键位查看口诀</span>';
+                    }
             }
         }
 
         // 按钮事件
         startBtn.addEventListener('click', startGame);
         restartBtn.addEventListener('click', startGame);
+
+        // 类别选择事件
+        const mixOptionsPanel = document.getElementById('mixOptions');
+        const mixRootsCheckbox = document.getElementById('mixRoots');
+        
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                
+                const category = btn.dataset.category;
+                
+                // 字根练习显示图片模式选项
+                if (category === 'roots') {
+                    imageModeToggle.style.display = 'block';
+                } else if (category === 'mixed') {
+                    // 混合模式时，如果选了字根也显示图片模式选项
+                    imageModeToggle.style.display = mixRootsCheckbox.checked ? 'block' : 'none';
+                } else {
+                    imageModeToggle.style.display = 'none';
+                }
+                
+                // 混合练习显示混合选项
+                if (category === 'mixed') {
+                    mixOptionsPanel.style.display = 'block';
+                } else {
+                    mixOptionsPanel.style.display = 'none';
+                }
+            });
+        });
+        
+        // 混合模式字根选项变化时，更新图片模式选项显示
+        mixRootsCheckbox.addEventListener('change', () => {
+            const selectedCategory = document.querySelector('.category-btn.selected');
+            if (selectedCategory && selectedCategory.dataset.category === 'mixed') {
+                imageModeToggle.style.display = mixRootsCheckbox.checked ? 'block' : 'none';
+            }
+        });
+
+        // 难度选择事件
+        diffBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                diffBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
 
         // 图片模式切换
         useImageModeCheckbox.addEventListener('change', async () => {
