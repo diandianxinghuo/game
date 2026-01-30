@@ -1150,33 +1150,6 @@
             }
         }
 
-        // 检查当前输入是否应该自动发射（混合模式）
-        function shouldAutoFire() {
-            if (gameConfig.category !== 'mixed') return false;
-            
-            const input = gameState.currentInput.toUpperCase();
-            
-            // 检查是否匹配一级简码
-            if (input.length === 1 && gameConfig.mixedOptions.first) {
-                const match = firstCodeData.find(item => item.code === input);
-                if (match) {
-                    // 检查是否有船只使用这个编码
-                    const boat = gameState.boats.find(b => b.key === input);
-                    if (boat) return true;
-                }
-            }
-            
-            // 检查是否匹配二级简码
-            if (input.length === 2 && gameConfig.mixedOptions.second) {
-                const match = secondCodeData.find(item => item.code === input);
-                if (match) {
-                    const boat = gameState.boats.find(b => b.key === input);
-                    if (boat) return true;
-                }
-            }
-            
-            return false;
-        }
 
         // 难度设置
         const difficultySettings = {
@@ -1633,19 +1606,19 @@
             const hintTitle = document.getElementById('hintTitle');
             switch(gameConfig.category) {
                 case 'first':
-                    inputLabel.textContent = '输入一级简码（自动发射）：';
+                    inputLabel.textContent = '输入一级简码（空格发射）：';
                     hintTitle.textContent = '💡 一级简码';
                     break;
                 case 'second':
-                    inputLabel.textContent = '输入二级简码（自动发射）：';
+                    inputLabel.textContent = '输入二级简码（空格发射）：';
                     hintTitle.textContent = '💡 二级简码';
                     break;
                 case 'mixed':
-                    inputLabel.textContent = '输入编码（简码自动发射，字根空格确认）：';
+                    inputLabel.textContent = '输入编码（空格发射）：';
                     hintTitle.textContent = '💡 混合练习';
                     break;
                 default:
-                    inputLabel.textContent = '输入五笔编码（空格确认）：';
+                    inputLabel.textContent = '输入五笔编码（空格发射）：';
                     hintTitle.textContent = '💡 字根口诀';
             }
             
@@ -1698,24 +1671,6 @@
                 gameState.currentInput += e.key.toUpperCase();
                 inputCodeEl.textContent = gameState.currentInput;
                 updateHint();
-                
-                // 一级简码和二级简码自动发射
-                if ((gameConfig.category === 'first' && gameState.currentInput.length === 1) ||
-                    (gameConfig.category === 'second' && gameState.currentInput.length === 2)) {
-                    checkInput();
-                }
-                
-                // 混合模式：检查是否匹配船只并自动发射
-                if (gameConfig.category === 'mixed') {
-                    const input = gameState.currentInput;
-                    const matchingBoat = gameState.boats.find(b => b.key === input);
-                    if (matchingBoat) {
-                        // 检查是否是一级或二级简码类型的船
-                        if (matchingBoat.type === 'first' || matchingBoat.type === 'second') {
-                            checkInput();
-                        }
-                    }
-                }
             }
         });
 
@@ -1767,7 +1722,7 @@
                         }
                         hintContent.innerHTML = hintHtml || `<span class="hint-text">混合模式：${mixInfo.join(' + ')}</span>`;
                     } else {
-                        hintContent.innerHTML = `<span class="hint-text">混合模式：${mixInfo.join(' + ')}<br>简码自动发射，字根按空格确认</span>`;
+                        hintContent.innerHTML = `<span class="hint-text">混合模式：${mixInfo.join(' + ')}<br>按空格键发射</span>`;
                     }
                     break;
                 
