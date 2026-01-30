@@ -543,6 +543,51 @@
             background: linear-gradient(to bottom, #ff4444, #cc0000);
         }
 
+        /* 混合练习选项 */
+        .mix-options {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+        }
+
+        .mix-checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mix-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 2px solid #9b59b6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .mix-checkbox:hover {
+            background: rgba(155, 89, 182, 0.4);
+        }
+
+        .mix-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .mix-checkbox input[type="checkbox"]:checked + span {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
         .section-title {
             color: #ffd700;
             margin: 15px 0 10px;
@@ -784,6 +829,29 @@
                 <div class="category-btn" data-category="second">
                     <div class="category-title">二级简码</div>
                     <div class="category-desc">常用字，双键输入</div>
+                </div>
+                <div class="category-btn" data-category="mixed">
+                    <div class="category-title">混合练习</div>
+                    <div class="category-desc">自定义混合内容</div>
+                </div>
+            </div>
+
+            <!-- 混合练习选项 -->
+            <div class="mix-options" id="mixOptions" style="display: none;">
+                <div class="section-title">选择要混合的内容（至少选一项）</div>
+                <div class="mix-checkboxes">
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixRoots" checked>
+                        <span>字根</span>
+                    </label>
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixFirst" checked>
+                        <span>一级简码</span>
+                    </label>
+                    <label class="mix-checkbox">
+                        <input type="checkbox" id="mixSecond" checked>
+                        <span>二级简码</span>
+                    </label>
                 </div>
             </div>
 
@@ -1209,7 +1277,12 @@
             useImageMode: false,
             imagesLoaded: false,
             availableKeys: [],  // 有可用字根的键位
-            category: 'roots'   // 当前类别: roots, first, second
+            category: 'roots',  // 当前类别: roots, first, second, mixed
+            mixedOptions: {     // 混合模式选项
+                roots: true,
+                first: true,
+                second: true
+            }
         };
 
         // 游戏状态
@@ -1231,8 +1304,37 @@
             switch(gameConfig.category) {
                 case 'first': return 1;
                 case 'second': return 2;
+                case 'mixed': return 4; // 混合模式需要支持最长的输入
                 default: return 4;
             }
+        }
+
+        // 检查当前输入是否应该自动发射（混合模式）
+        function shouldAutoFire() {
+            if (gameConfig.category !== 'mixed') return false;
+            
+            const input = gameState.currentInput.toUpperCase();
+            
+            // 检查是否匹配一级简码
+            if (input.length === 1 && gameConfig.mixedOptions.first) {
+                const match = firstCodeData.find(item => item.code === input);
+                if (match) {
+                    // 检查是否有船只使用这个编码
+                    const boat = gameState.boats.find(b => b.key === input);
+                    if (boat) return true;
+                }
+            }
+            
+            // 检查是否匹配二级简码
+            if (input.length === 2 && gameConfig.mixedOptions.second) {
+                const match = secondCodeData.find(item => item.code === input);
+                if (match) {
+                    const boat = gameState.boats.find(b => b.key === input);
+                    if (boat) return true;
+                }
+            }
+            
+            return false;
         }
 
         // 难度设置
@@ -1330,53 +1432,90 @@
             });
         }
 
+        // 获取字根数据
+        function getRootsRadical() {
+            if (gameConfig.useImageMode && gameConfig.imagesLoaded && gameConfig.availableKeys.length > 0) {
+                // 图片模式
+                const key = gameConfig.availableKeys[Math.floor(Math.random() * gameConfig.availableKeys.length)];
+                const keyData = wubiImageData[key];
+                const imgIndex = Math.floor(Math.random() * keyData.count);
+                const imgPath = keyData.loaded[imgIndex];
+                return { 
+                    key: key, 
+                    display: `<img src="${imgPath}" alt="${key}">`,
+                    isImage: true,
+                    type: 'roots'
+                };
+            } else {
+                // 文字模式
+                const keys = Object.keys(wubiTextData);
+                const key = keys[Math.floor(Math.random() * keys.length)];
+                const chars = wubiTextData[key];
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                return { 
+                    key: key, 
+                    display: char,
+                    isImage: false,
+                    type: 'roots'
+                };
+            }
+        }
+
+        // 获取一级简码数据
+        function getFirstCodeRadical() {
+            const firstItem = firstCodeData[Math.floor(Math.random() * firstCodeData.length)];
+            return {
+                key: firstItem.code,
+                display: firstItem.char,
+                isImage: false,
+                type: 'first'
+            };
+        }
+
+        // 获取二级简码数据
+        function getSecondCodeRadical() {
+            const secondItem = secondCodeData[Math.floor(Math.random() * secondCodeData.length)];
+            return {
+                key: secondItem.code,
+                display: secondItem.char,
+                isImage: false,
+                type: 'second'
+            };
+        }
+
         // 获取随机字根/汉字
         function getRandomRadical() {
             // 根据类别选择不同的数据源
             switch(gameConfig.category) {
                 case 'first':
-                    // 一级简码 - 单键
-                    const firstItem = firstCodeData[Math.floor(Math.random() * firstCodeData.length)];
-                    return {
-                        key: firstItem.code,
-                        display: firstItem.char,
-                        isImage: false
-                    };
+                    return getFirstCodeRadical();
                 
                 case 'second':
-                    // 二级简码 - 双键
-                    const secondItem = secondCodeData[Math.floor(Math.random() * secondCodeData.length)];
-                    return {
-                        key: secondItem.code,
-                        display: secondItem.char,
-                        isImage: false
-                    };
+                    return getSecondCodeRadical();
+                
+                case 'mixed':
+                    // 混合模式 - 根据选项随机选择
+                    const options = [];
+                    if (gameConfig.mixedOptions.roots) options.push('roots');
+                    if (gameConfig.mixedOptions.first) options.push('first');
+                    if (gameConfig.mixedOptions.second) options.push('second');
+                    
+                    if (options.length === 0) {
+                        // 如果没有选择任何选项，默认使用字根
+                        return getRootsRadical();
+                    }
+                    
+                    const selectedType = options[Math.floor(Math.random() * options.length)];
+                    switch(selectedType) {
+                        case 'roots': return getRootsRadical();
+                        case 'first': return getFirstCodeRadical();
+                        case 'second': return getSecondCodeRadical();
+                    }
+                    break;
                 
                 default:
                     // 字根练习模式
-                    if (gameConfig.useImageMode && gameConfig.imagesLoaded && gameConfig.availableKeys.length > 0) {
-                        // 图片模式
-                        const key = gameConfig.availableKeys[Math.floor(Math.random() * gameConfig.availableKeys.length)];
-                        const keyData = wubiImageData[key];
-                        const imgIndex = Math.floor(Math.random() * keyData.count);
-                        const imgPath = keyData.loaded[imgIndex];
-                        return { 
-                            key: key, 
-                            display: `<img src="${imgPath}" alt="${key}">`,
-                            isImage: true
-                        };
-                    } else {
-                        // 文字模式
-                        const keys = Object.keys(wubiTextData);
-                        const key = keys[Math.floor(Math.random() * keys.length)];
-                        const chars = wubiTextData[key];
-                        const char = chars[Math.floor(Math.random() * chars.length)];
-                        return { 
-                            key: key, 
-                            display: char,
-                            isImage: false
-                        };
-                    }
+                    return getRootsRadical();
             }
         }
 
@@ -1410,6 +1549,7 @@
             const boatData = {
                 element: boat,
                 key: radical.key,
+                type: radical.type || 'roots',  // 保存类型用于混合模式自动发射
                 x: startX,
                 y: yPos,
                 direction: direction,
@@ -1616,8 +1756,23 @@
             const selectedCategory = document.querySelector('.category-btn.selected');
             gameConfig.category = selectedCategory ? selectedCategory.dataset.category : 'roots';
 
-            // 检查图片模式（仅字根练习模式有效）
-            gameConfig.useImageMode = gameConfig.category === 'roots' && useImageModeCheckbox.checked;
+            // 如果是混合模式，读取混合选项
+            if (gameConfig.category === 'mixed') {
+                gameConfig.mixedOptions.roots = document.getElementById('mixRoots').checked;
+                gameConfig.mixedOptions.first = document.getElementById('mixFirst').checked;
+                gameConfig.mixedOptions.second = document.getElementById('mixSecond').checked;
+                
+                // 验证至少选择了一项
+                if (!gameConfig.mixedOptions.roots && !gameConfig.mixedOptions.first && !gameConfig.mixedOptions.second) {
+                    alert('请至少选择一种混合内容！');
+                    return;
+                }
+            }
+
+            // 检查图片模式（字根练习模式或混合模式包含字根时有效）
+            gameConfig.useImageMode = (gameConfig.category === 'roots' || 
+                (gameConfig.category === 'mixed' && gameConfig.mixedOptions.roots)) && 
+                useImageModeCheckbox.checked;
 
             gameState.isPlaying = true;
             gameState.score = 0;
@@ -1643,6 +1798,10 @@
                 case 'second':
                     inputLabel.textContent = '输入二级简码（自动发射）：';
                     hintTitle.textContent = '💡 二级简码';
+                    break;
+                case 'mixed':
+                    inputLabel.textContent = '输入编码（简码自动发射，字根空格确认）：';
+                    hintTitle.textContent = '💡 混合练习';
                     break;
                 default:
                     inputLabel.textContent = '输入五笔编码（空格确认）：';
@@ -1704,6 +1863,18 @@
                     (gameConfig.category === 'second' && gameState.currentInput.length === 2)) {
                     checkInput();
                 }
+                
+                // 混合模式：检查是否匹配船只并自动发射
+                if (gameConfig.category === 'mixed') {
+                    const input = gameState.currentInput;
+                    const matchingBoat = gameState.boats.find(b => b.key === input);
+                    if (matchingBoat) {
+                        // 检查是否是一级或二级简码类型的船
+                        if (matchingBoat.type === 'first' || matchingBoat.type === 'second') {
+                            checkInput();
+                        }
+                    }
+                }
             }
         });
 
@@ -1734,6 +1905,31 @@
                     }
                     break;
                 
+                case 'mixed':
+                    // 混合练习 - 显示当前选中的混合内容提示
+                    let mixInfo = [];
+                    if (gameConfig.mixedOptions.roots) mixInfo.push('字根');
+                    if (gameConfig.mixedOptions.first) mixInfo.push('一级简码');
+                    if (gameConfig.mixedOptions.second) mixInfo.push('二级简码');
+                    
+                    if (input && input.length === 1 && validKeys.includes(input)) {
+                        let hintHtml = '';
+                        // 显示对应键位的口诀
+                        if (gameConfig.mixedOptions.roots) {
+                            hintHtml += `<img src="slogan/${input}.png" alt="${input}键口诀" style="max-width:150px;"><br>`;
+                        }
+                        // 显示二级简码
+                        if (gameConfig.mixedOptions.second) {
+                            const codes = secondCodeData.filter(item => item.code.startsWith(input));
+                            const codesText = codes.slice(0, 10).map(item => `${item.code}=${item.char}`).join(' ');
+                            hintHtml += `<span class="hint-text">${input}区：${codesText}...</span>`;
+                        }
+                        hintContent.innerHTML = hintHtml || `<span class="hint-text">混合模式：${mixInfo.join(' + ')}</span>`;
+                    } else {
+                        hintContent.innerHTML = `<span class="hint-text">混合模式：${mixInfo.join(' + ')}<br>简码自动发射，字根按空格确认</span>`;
+                    }
+                    break;
+                
                 default:
                     // 字根练习 - 显示口诀图片
                     if (input && input.length === 1 && validKeys.includes(input)) {
@@ -1749,19 +1945,41 @@
         restartBtn.addEventListener('click', startGame);
 
         // 类别选择事件
+        const mixOptionsPanel = document.getElementById('mixOptions');
+        const mixRootsCheckbox = document.getElementById('mixRoots');
+        
         categoryBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 categoryBtns.forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 
-                // 只有字根练习才显示图片模式选项
                 const category = btn.dataset.category;
+                
+                // 字根练习显示图片模式选项
                 if (category === 'roots') {
                     imageModeToggle.style.display = 'block';
+                } else if (category === 'mixed') {
+                    // 混合模式时，如果选了字根也显示图片模式选项
+                    imageModeToggle.style.display = mixRootsCheckbox.checked ? 'block' : 'none';
                 } else {
                     imageModeToggle.style.display = 'none';
                 }
+                
+                // 混合练习显示混合选项
+                if (category === 'mixed') {
+                    mixOptionsPanel.style.display = 'block';
+                } else {
+                    mixOptionsPanel.style.display = 'none';
+                }
             });
+        });
+        
+        // 混合模式字根选项变化时，更新图片模式选项显示
+        mixRootsCheckbox.addEventListener('change', () => {
+            const selectedCategory = document.querySelector('.category-btn.selected');
+            if (selectedCategory && selectedCategory.dataset.category === 'mixed') {
+                imageModeToggle.style.display = mixRootsCheckbox.checked ? 'block' : 'none';
+            }
         });
 
         // 难度选择事件
