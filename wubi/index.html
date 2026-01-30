@@ -392,17 +392,64 @@
             transform: scale(1.1);
         }
 
-        .difficulty-select {
-            margin: 20px 0;
+        .difficulty-select, .mode-select {
+            margin: 15px 0;
         }
 
-        .difficulty-select label {
+        .difficulty-select label, .mode-select label {
             margin: 0 10px;
             cursor: pointer;
         }
 
-        .difficulty-select input[type="radio"] {
+        .difficulty-select input[type="radio"], .mode-select input[type="radio"] {
             margin-right: 5px;
+        }
+
+        .mode-select {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 15px 25px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .mode-btn.selected {
+            background: linear-gradient(to bottom, #ffd700, #ff8c00);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .mode-btn .mode-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .mode-btn .mode-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .section-title {
+            color: #ffd700;
+            margin: 15px 0 10px;
+            font-size: 16px;
         }
 
         .hidden {
