@@ -1037,209 +1037,50 @@
             { code: 'X', char: '经' }
         ];
 
-        // 二级简码数据 (双键)
-        const secondCodeData = [
-            // G 区
-            { code: 'GA', char: '开' }, { code: 'GD', char: '于' }, { code: 'GF', char: '天' },
-            { code: 'GG', char: '五' }, { code: 'GH', char: '下' }, { code: 'GJ', char: '理' },
-            { code: 'GK', char: '事' }, { code: 'GM', char: '现' }, { code: 'GN', char: '画' },
-            { code: 'GP', char: '与' }, { code: 'GQ', char: '来' }, { code: 'GR', char: '列' },
-            { code: 'GS', char: '珠' }, { code: 'GT', char: '末' }, { code: 'GU', char: '玫' },
-            { code: 'GW', char: '平' }, { code: 'GX', char: '妻' }, { code: 'GY', char: '珍' },
-            { code: 'GB', char: '互' }, { code: 'GC', char: '玉' },
-            // F 区
-            { code: 'FA', char: '载' }, { code: 'FD', char: '城' }, { code: 'FF', char: '寺' },
-            { code: 'FG', char: '二' }, { code: 'FH', char: '直' }, { code: 'FJ', char: '示' },
-            { code: 'FK', char: '进' }, { code: 'FM', char: '吉' }, { code: 'FN', char: '协' },
-            { code: 'FP', char: '南' }, { code: 'FQ', char: '志' }, { code: 'FR', char: '赤' },
-            { code: 'FS', char: '过' }, { code: 'FT', char: '无' }, { code: 'FU', char: '垢' },
-            { code: 'FV', char: '霜' }, { code: 'FW', char: '才' }, { code: 'FX', char: '增' },
-            { code: 'FY', char: '雪' }, { code: 'FB', char: '夫' }, { code: 'FC', char: '坟' },
-            // D 区
-            { code: 'DA', char: '左' }, { code: 'DD', char: '顾' }, { code: 'DF', char: '大' },
-            { code: 'DG', char: '友' }, { code: 'DH', char: '右' }, { code: 'DJ', char: '丰' },
-            { code: 'DK', char: '历' }, { code: 'DM', char: '面' }, { code: 'DN', char: '帮' },
-            { code: 'DP', char: '原' }, { code: 'DQ', char: '胡' }, { code: 'DR', char: '春' },
-            { code: 'DS', char: '克' }, { code: 'DT', char: '太' }, { code: 'DU', char: '磁' },
-            { code: 'DV', char: '砂' }, { code: 'DW', char: '灰' }, { code: 'DX', char: '达' },
-            { code: 'DY', char: '成' }, { code: 'DB', char: '肆' }, { code: 'DC', char: '龙' },
-            // S 区
-            { code: 'SA', char: '械' }, { code: 'SD', char: '权' }, { code: 'SF', char: '本' },
-            { code: 'SG', char: '村' }, { code: 'SH', char: '枯' }, { code: 'SJ', char: '林' },
-            { code: 'SK', char: '革' }, { code: 'SM', char: '式' }, { code: 'SN', char: '格' },
-            { code: 'SP', char: '样' }, { code: 'SQ', char: '检' }, { code: 'SR', char: '标' },
-            { code: 'SS', char: '木' }, { code: 'ST', char: '杨' }, { code: 'SU', char: '李' },
-            { code: 'SV', char: '要' }, { code: 'SW', char: '权' }, { code: 'SX', char: '楷' },
-            { code: 'SY', char: '七' }, { code: 'SB', char: '革' }, { code: 'SC', char: '基' },
-            // A 区
-            { code: 'AA', char: '式' }, { code: 'AD', char: '功' }, { code: 'AF', char: '攻' },
-            { code: 'AG', char: '匠' }, { code: 'AH', char: '菜' }, { code: 'AJ', char: '共' },
-            { code: 'AK', char: '区' }, { code: 'AM', char: '芳' }, { code: 'AN', char: '燕' },
-            { code: 'AP', char: '东' }, { code: 'AQ', char: '芝' }, { code: 'AR', char: '世' },
-            { code: 'AS', char: '节' }, { code: 'AT', char: '切' }, { code: 'AU', char: '芭' },
-            { code: 'AV', char: '药' }, { code: 'AW', char: '睛' }, { code: 'AX', char: '睦' },
-            { code: 'AY', char: '盯' }, { code: 'AB', char: '虎' }, { code: 'AC', char: '止' },
-            // H 区
-            { code: 'HA', char: '皮' }, { code: 'HD', char: '睛' }, { code: 'HF', char: '盯' },
-            { code: 'HG', char: '步' }, { code: 'HH', char: '睡' }, { code: 'HJ', char: '肯' },
-            { code: 'HK', char: '餐' }, { code: 'HM', char: '量' }, { code: 'HN', char: '时' },
-            { code: 'HP', char: '晨' }, { code: 'HQ', char: '果' }, { code: 'HR', char: '虹' },
-            { code: 'HS', char: '早' }, { code: 'HT', char: '昌' }, { code: 'HU', char: '蝇' },
-            { code: 'HV', char: '昨' }, { code: 'HW', char: '遇' }, { code: 'HX', char: '晚' },
-            { code: 'HY', char: '景' }, { code: 'HB', char: '暗' }, { code: 'HC', char: '晃' },
-            // J 区
-            { code: 'JA', char: '虹' }, { code: 'JD', char: '最' }, { code: 'JF', char: '晨' },
-            { code: 'JG', char: '量' }, { code: 'JH', char: '时' }, { code: 'JJ', char: '昌' },
-            { code: 'JK', char: '蝇' }, { code: 'JM', char: '昨' }, { code: 'JN', char: '遇' },
-            { code: 'JP', char: '晚' }, { code: 'JQ', char: '景' }, { code: 'JR', char: '暗' },
-            { code: 'JS', char: '晃' }, { code: 'JT', char: '显' }, { code: 'JU', char: '晕' },
-            { code: 'JV', char: '电' }, { code: 'JW', char: '最' }, { code: 'JX', char: '归' },
-            { code: 'JY', char: '紧' }, { code: 'JB', char: '昆' }, { code: 'JC', char: '呈' },
-            // K 区
-            { code: 'KA', char: '呀' }, { code: 'KD', char: '吧' }, { code: 'KF', char: '顺' },
-            { code: 'KG', char: '吸' }, { code: 'KH', char: '叶' }, { code: 'KJ', char: '呈' },
-            { code: 'KK', char: '中' }, { code: 'KM', char: '虽' }, { code: 'KN', char: '吕' },
-            { code: 'KP', char: '另' }, { code: 'KQ', char: '员' }, { code: 'KR', char: '叫' },
-            { code: 'KS', char: '咖' }, { code: 'KT', char: '吧' }, { code: 'KU', char: '电' },
-            { code: 'KV', char: '边' }, { code: 'KW', char: '另' }, { code: 'KX', char: '罗' },
-            { code: 'KY', char: '力' }, { code: 'KB', char: '较' }, { code: 'KC', char: '嘛' },
-            // L 区
-            { code: 'LA', char: '轻' }, { code: 'LD', char: '因' }, { code: 'LF', char: '胃' },
-            { code: 'LG', char: '轩' }, { code: 'LH', char: '车' }, { code: 'LJ', char: '四' },
-            { code: 'LK', char: '辊' }, { code: 'LM', char: '加' }, { code: 'LN', char: '男' },
-            { code: 'LP', char: '轴' }, { code: 'LQ', char: '思' }, { code: 'LR', char: '辚' },
-            { code: 'LS', char: '边' }, { code: 'LT', char: '罗' }, { code: 'LU', char: '斩' },
-            { code: 'LV', char: '困' }, { code: 'LW', char: '力' }, { code: 'LX', char: '较' },
-            { code: 'LY', char: '轨' }, { code: 'LB', char: '办' }, { code: 'LC', char: '累' },
-            // M 区
-            { code: 'MA', char: '曲' }, { code: 'MD', char: '邮' }, { code: 'MF', char: '凤' },
-            { code: 'MG', char: '央' }, { code: 'MH', char: '骨' }, { code: 'MJ', char: '财' },
-            { code: 'MK', char: '同' }, { code: 'MM', char: '由' }, { code: 'MN', char: '峭' },
-            { code: 'MP', char: '则' }, { code: 'MQ', char: '崭' }, { code: 'MR', char: '册' },
-            { code: 'MS', char: '岂' }, { code: 'MT', char: '迪' }, { code: 'MU', char: '风' },
-            { code: 'MV', char: '贩' }, { code: 'MW', char: '朵' }, { code: 'MX', char: '几' },
-            { code: 'MY', char: '赠' }, { code: 'MB', char: '内' }, { code: 'MC', char: '凡' },
-            // T 区
-            { code: 'TA', char: '长' }, { code: 'TD', char: '季' }, { code: 'TF', char: '么' },
-            { code: 'TG', char: '知' }, { code: 'TH', char: '秀' }, { code: 'TJ', char: '行' },
-            { code: 'TK', char: '生' }, { code: 'TM', char: '处' }, { code: 'TN', char: '秒' },
-            { code: 'TP', char: '得' }, { code: 'TQ', char: '各' }, { code: 'TR', char: '务' },
-            { code: 'TS', char: '向' }, { code: 'TT', char: '秘' }, { code: 'TU', char: '秋' },
-            { code: 'TV', char: '管' }, { code: 'TW', char: '称' }, { code: 'TX', char: '第' },
-            { code: 'TY', char: '科' }, { code: 'TB', char: '委' }, { code: 'TC', char: '答' },
-            // R 区
-            { code: 'RA', char: '找' }, { code: 'RD', char: '报' }, { code: 'RF', char: '反' },
-            { code: 'RG', char: '拓' }, { code: 'RH', char: '扔' }, { code: 'RJ', char: '持' },
-            { code: 'RK', char: '后' }, { code: 'RM', char: '年' }, { code: 'RN', char: '朱' },
-            { code: 'RP', char: '提' }, { code: 'RQ', char: '扣' }, { code: 'RR', char: '押' },
-            { code: 'RS', char: '抽' }, { code: 'RT', char: '所' }, { code: 'RU', char: '搂' },
-            { code: 'RV', char: '近' }, { code: 'RW', char: '换' }, { code: 'RX', char: '折' },
-            { code: 'RY', char: '打' }, { code: 'RB', char: '手' }, { code: 'RC', char: '拉' },
-            // E 区
-            { code: 'EA', char: '肛' }, { code: 'ED', char: '服' }, { code: 'EF', char: '肥' },
-            { code: 'EG', char: '须' }, { code: 'EH', char: '朋' }, { code: 'EJ', char: '肝' },
-            { code: 'EK', char: '且' }, { code: 'EM', char: '膛' }, { code: 'EN', char: '胆' },
-            { code: 'EP', char: '肿' }, { code: 'EQ', char: '肋' }, { code: 'ER', char: '肌' },
-            { code: 'ES', char: '甩' }, { code: 'ET', char: '膦' }, { code: 'EU', char: '爱' },
-            { code: 'EV', char: '胸' }, { code: 'EW', char: '遥' }, { code: 'EX', char: '采' },
-            { code: 'EY', char: '用' }, { code: 'EB', char: '妥' }, { code: 'EC', char: '脸' },
-            // W 区
-            { code: 'WA', char: '代' }, { code: 'WD', char: '他' }, { code: 'WF', char: '公' },
-            { code: 'WG', char: '估' }, { code: 'WH', char: '仍' }, { code: 'WJ', char: '会' },
-            { code: 'WK', char: '全' }, { code: 'WM', char: '个' }, { code: 'WN', char: '偿' },
-            { code: 'WP', char: '介' }, { code: 'WQ', char: '保' }, { code: 'WR', char: '佃' },
-            { code: 'WS', char: '仙' }, { code: 'WT', char: '作' }, { code: 'WU', char: '伯' },
-            { code: 'WV', char: '们' }, { code: 'WW', char: '从' }, { code: 'WX', char: '你' },
-            { code: 'WY', char: '信' }, { code: 'WB', char: '们' }, { code: 'WC', char: '的' },
-            // Q 区
-            { code: 'QA', char: '氏' }, { code: 'QD', char: '凶' }, { code: 'QF', char: '色' },
-            { code: 'QG', char: '然' }, { code: 'QH', char: '角' }, { code: 'QJ', char: '针' },
-            { code: 'QK', char: '钱' }, { code: 'QM', char: '外' }, { code: 'QN', char: '乐' },
-            { code: 'QP', char: '旬' }, { code: 'QQ', char: '名' }, { code: 'QR', char: '甸' },
-            { code: 'QS', char: '负' }, { code: 'QT', char: '包' }, { code: 'QU', char: '炙' },
-            { code: 'QV', char: '锭' }, { code: 'QW', char: '多' }, { code: 'QX', char: '铁' },
-            { code: 'QY', char: '钉' }, { code: 'QB', char: '儿' }, { code: 'QC', char: '匀' },
-            // Y 区
-            { code: 'YA', char: '度' }, { code: 'YD', char: '离' }, { code: 'YF', char: '充' },
-            { code: 'YG', char: '庆' }, { code: 'YH', char: '衣' }, { code: 'YJ', char: '计' },
-            { code: 'YK', char: '主' }, { code: 'YM', char: '让' }, { code: 'YN', char: '就' },
-            { code: 'YP', char: '刘' }, { code: 'YQ', char: '训' }, { code: 'YR', char: '为' },
-            { code: 'YS', char: '高' }, { code: 'YT', char: '记' }, { code: 'YU', char: '变' },
-            { code: 'YV', char: '这' }, { code: 'YW', char: '义' }, { code: 'YX', char: '诉' },
-            { code: 'YY', char: '订' }, { code: 'YB', char: '放' }, { code: 'YC', char: '说' },
-            // U 区
-            { code: 'UA', char: '并' }, { code: 'UD', char: '闻' }, { code: 'UF', char: '冯' },
-            { code: 'UG', char: '关' }, { code: 'UH', char: '前' }, { code: 'UJ', char: '半' },
-            { code: 'UK', char: '闫' }, { code: 'UM', char: '站' }, { code: 'UN', char: '冰' },
-            { code: 'UP', char: '间' }, { code: 'UQ', char: '部' }, { code: 'UR', char: '曾' },
-            { code: 'US', char: '商' }, { code: 'UT', char: '决' }, { code: 'UU', char: '普' },
-            { code: 'UV', char: '帝' }, { code: 'UW', char: '交' }, { code: 'UX', char: '瓣' },
-            { code: 'UY', char: '亲' }, { code: 'UB', char: '产' }, { code: 'UC', char: '立' },
-            // I 区
-            { code: 'IA', char: '江' }, { code: 'ID', char: '池' }, { code: 'IF', char: '汉' },
-            { code: 'IG', char: '尖' }, { code: 'IH', char: '肖' }, { code: 'IJ', char: '法' },
-            { code: 'IK', char: '汪' }, { code: 'IM', char: '小' }, { code: 'IN', char: '水' },
-            { code: 'IP', char: '浊' }, { code: 'IQ', char: '澡' }, { code: 'IR', char: '渐' },
-            { code: 'IS', char: '没' }, { code: 'IT', char: '沁' }, { code: 'IU', char: '淡' },
-            { code: 'IV', char: '学' }, { code: 'IW', char: '光' }, { code: 'IX', char: '泊' },
-            { code: 'IY', char: '酒' }, { code: 'IB', char: '少' }, { code: 'IC', char: '洋' },
-            // O 区
-            { code: 'OA', char: '煤' }, { code: 'OD', char: '籽' }, { code: 'OF', char: '烃' },
-            { code: 'OG', char: '类' }, { code: 'OH', char: '粗' }, { code: 'OJ', char: '灶' },
-            { code: 'OK', char: '业' }, { code: 'OM', char: '粘' }, { code: 'ON', char: '炒' },
-            { code: 'OP', char: '烛' }, { code: 'OQ', char: '炽' }, { code: 'OR', char: '烟' },
-            { code: 'OS', char: '灿' }, { code: 'OT', char: '烽' }, { code: 'OU', char: '煌' },
-            { code: 'OV', char: '灯' }, { code: 'OW', char: '料' }, { code: 'OX', char: '断' },
-            { code: 'OY', char: '籽' }, { code: 'OB', char: '娄' }, { code: 'OC', char: '烃' },
-            // P 区
-            { code: 'PA', char: '定' }, { code: 'PD', char: '守' }, { code: 'PF', char: '害' },
-            { code: 'PG', char: '宁' }, { code: 'PH', char: '宽' }, { code: 'PJ', char: '寂' },
-            { code: 'PK', char: '审' }, { code: 'PM', char: '宫' }, { code: 'PN', char: '军' },
-            { code: 'PP', char: '宙' }, { code: 'PQ', char: '客' }, { code: 'PR', char: '宾' },
-            { code: 'PS', char: '家' }, { code: 'PT', char: '空' }, { code: 'PU', char: '宛' },
-            { code: 'PV', char: '社' }, { code: 'PW', char: '实' }, { code: 'PX', char: '宵' },
-            { code: 'PY', char: '灾' }, { code: 'PB', char: '之' }, { code: 'PC', char: '官' },
-            // N 区
-            { code: 'NA', char: '民' }, { code: 'ND', char: '敢' }, { code: 'NF', char: '怪' },
-            { code: 'NG', char: '居' }, { code: 'NH', char: '导' }, { code: 'NJ', char: '怀' },
-            { code: 'NK', char: '收' }, { code: 'NM', char: '悄' }, { code: 'NN', char: '慢' },
-            { code: 'NP', char: '避' }, { code: 'NQ', char: '惭' }, { code: 'NR', char: '届' },
-            { code: 'NS', char: '忆' }, { code: 'NT', char: '屡' }, { code: 'NU', char: '忧' },
-            { code: 'NV', char: '懈' }, { code: 'NW', char: '怕' }, { code: 'NX', char: '必' },
-            { code: 'NY', char: '习' }, { code: 'NB', char: '恨' }, { code: 'NC', char: '愉' },
-            // B 区
-            { code: 'BA', char: '陈' }, { code: 'BD', char: '子' }, { code: 'BF', char: '取' },
-            { code: 'BG', char: '承' }, { code: 'BH', char: '阴' }, { code: 'BJ', char: '际' },
-            { code: 'BK', char: '卫' }, { code: 'BM', char: '耻' }, { code: 'BN', char: '孙' },
-            { code: 'BP', char: '阳' }, { code: 'BQ', char: '职' }, { code: 'BR', char: '阵' },
-            { code: 'BS', char: '出' }, { code: 'BT', char: '也' }, { code: 'BU', char: '耿' },
-            { code: 'BV', char: '辽' }, { code: 'BW', char: '隐' }, { code: 'BX', char: '孤' },
-            { code: 'BY', char: '阿' }, { code: 'BB', char: '降' }, { code: 'BC', char: '联' },
-            // V 区
-            { code: 'VA', char: '姨' }, { code: 'VD', char: '寻' }, { code: 'VF', char: '姑' },
-            { code: 'VG', char: '杂' }, { code: 'VH', char: '毁' }, { code: 'VJ', char: '旭' },
-            { code: 'VK', char: '如' }, { code: 'VM', char: '舅' }, { code: 'VN', char: '妗' },
-            { code: 'VP', char: '刀' }, { code: 'VQ', char: '灵' }, { code: 'VR', char: '巡' },
-            { code: 'VS', char: '婚' }, { code: 'VT', char: '妨' }, { code: 'VU', char: '嫌' },
-            { code: 'VV', char: '录' }, { code: 'VW', char: '巢' }, { code: 'VX', char: '姹' },
-            { code: 'VY', char: '好' }, { code: 'VB', char: '妈' }, { code: 'VC', char: '参' },
-            // C 区
-            { code: 'CA', char: '戏' }, { code: 'CD', char: '邓' }, { code: 'CF', char: '双' },
-            { code: 'CG', char: '参' }, { code: 'CH', char: '能' }, { code: 'CJ', char: '对' },
-            { code: 'CK', char: '骊' }, { code: 'CM', char: '台' }, { code: 'CN', char: '劝' },
-            { code: 'CP', char: '观' }, { code: 'CQ', char: '矣' }, { code: 'CR', char: '牟' },
-            { code: 'CS', char: '难' }, { code: 'CT', char: '允' }, { code: 'CU', char: '驻' },
-            { code: 'CV', char: '骈' }, { code: 'CW', char: '驼' }, { code: 'CX', char: '马' },
-            { code: 'CY', char: '邓' }, { code: 'CB', char: '艰' }, { code: 'CC', char: '双' },
-            // X 区
-            { code: 'XA', char: '线' }, { code: 'XD', char: '结' }, { code: 'XF', char: '顷' },
-            { code: 'XG', char: '红' }, { code: 'XH', char: '引' }, { code: 'XJ', char: '旨' },
-            { code: 'XK', char: '强' }, { code: 'XM', char: '细' }, { code: 'XN', char: '纲' },
-            { code: 'XP', char: '纪' }, { code: 'XQ', char: '驰' }, { code: 'XR', char: '绿' },
-            { code: 'XS', char: '经' }, { code: 'XT', char: '比' }, { code: 'XU', char: '纺' },
-            { code: 'XV', char: '弱' }, { code: 'XW', char: '纱' }, { code: 'XX', char: '继' },
-            { code: 'XY', char: '综' }, { code: 'XB', char: '纪' }, { code: 'XC', char: '级' }
-        ];
+        // 二级简码数据 (双键) - 根据新格式的表格数据
+        // 列顺序: A B C D E F G H I J K L M N O P Q R S T U V W X Y
+        const secondColumns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y'];
+        
+        const secondCodeRawData = {
+            'G': ['开', '屯', '到', '天', '表', '于', '五', '下', '不', '理', '事', '画', '现', '与', '来', '--', '列', '珠', '末', '玫', '平', '妻', '珍', '互', '玉'],
+            'F': ['载', '地', '支', '城', '圾', '寺', '二', '直', '示', '进', '吉', '协', '南', '志', '赤', '过', '无', '垢', '霜', '才', '增', '雪', '夫', '--', '坟'],
+            'D': ['左', '顾', '友', '大', '胡', '夺', '三', '丰', '砂', '百', '右', '历', '面', '成', '灰', '达', '克', '原', '厅', '帮', '磁', '肆', '春', '龙', '太'],
+            'S': ['械', '李', '权', '枯', '极', '村', '本', '相', '档', '查', '可', '楞', '机', '杨', '杰', '棕', '构', '析', '林', '格', '样', '要', '检', '楷', '术'],
+            'A': ['式', '节', '芭', '基', '菜', '革', '七', '牙', '东', '划', '或', '功', '贡', '世', '--', '芝', '区', '匠', '苛', '攻', '燕', '切', '共', '药', '芳'],
+            'H': ['虎', '--', '皮', '睚', '肯', '睦', '睛', '止', '步', '旧', '占', '卤', '贞', '卢', '眯', '瞎', '餐', '睥', '盯', '睡', '瞳', '眼', '具', '此', '眩'],
+            'J': ['虹', '最', '紧', '晨', '明', '时', '量', '早', '晃', '昌', '蝇', '曙', '遇', '电', '显', '晕', '晚', '蝗', '果', '昨', '暗', '归', '蛤', '昆', '景'],
+            'K': ['呀', '啊', '吧', '顺', '吸', '叶', '呈', '中', '吵', '虽', '吕', '另', '员', '叫', '噗', '喧', '史', '听', '呆', '呼', '啼', '哪', '只', '哟', '嘛'],
+            'L': ['轼', '囝', '轻', '因', '胃', '轩', '车', '四', '--', '辊', '加', '男', '轴', '思', '辚', '边', '罗', '斩', '困', '力', '较', '轨', '办', '累', '罚'],
+            'M': ['曲', '邮', '凤', '央', '骨', '财', '同', '由', '峭', '则', '--', '崭', '册', '岂', '赕', '迪', '风', '贩', '朵', '几', '赠', '--', '内', '嶷', '凡'],
+            'T': ['长', '季', '么', '知', '秀', '行', '生', '处', '秒', '得', '各', '务', '向', '秘', '秋', '管', '称', '物', '条', '笔', '科', '委', '答', '第', '入'],
+            'R': ['找', '报', '反', '拓', '扔', '持', '后', '年', '朱', '提', '扣', '押', '抽', '所', '搂', '近', '换', '折', '打', '手', '拉', '扫', '失', '批', '扩'],
+            'E': ['肛', '服', '肥', '须', '朋', '肝', '且', '胩', '膛', '胆', '肿', '肋', '肌', '甩', '膦', '爱', '胸', '遥', '采', '用', '胶', '妥', '脸', '脂', '及'],
+            'W': ['代', '他', '公', '估', '仍', '会', '全', '个', '偿', '介', '保', '佃', '仙', '亿', '伙', '--', '你', '伯', '休', '作', '们', '分', '从', '化', '信'],
+            'Q': ['氏', '凶', '色', '然', '角', '针', '钱', '外', '乐', '旬', '名', '甸', '负', '包', '炙', '锭', '多', '铁', '钉', '儿', '匀', '争', '欠', '--', '久'],
+            'Y': ['度', '离', '充', '庆', '衣', '计', '主', '让', '就', '是', '训', '为', '高', '记', '变', '这', '义', '诉', '订', '放', '说', '良', '认', '率', '方'],
+            'U': ['并', '闻', '冯', '关', '前', '半', '闰', '站', '冰', '间', '部', '曾', '商', '决', '普', '帝', '交', '瓣', '亲', '产', '立', '妆', '闪', '北', '六'],
+            'I': ['江', '池', '汉', '尖', '肖', '法', '汪', '小', '水', '浊', '澡', '渐', '没', '沁', '淡', '学', '光', '泊', '洒', '少', '洋', '当', '兴', '涨', '注'],
+            'O': ['煤', '籽', '烃', '类', '粗', '灶', '业', '粘', '炒', '烛', '炽', '烟', '灿', '断', '炎', '迷', '炮', '煌', '灯', '烽', '料', '娄', '粉', '糨', '米'],
+            'P': ['宽', '字', '--', '害', '家', '守', '定', '寂', '宵', '审', '宫', '军', '宙', '官', '灾', '之', '宛', '宾', '宁', '客', '实', '安', '空', '它', '社'],
+            'N': ['民', '敢', '怪', '居', '--', '导', '怀', '收', '悄', '慢', '避', '惭', '届', '忆', '屡', '忱', '懈', '怕', '--', '必', '习', '恨', '愉', '尼', '心'],
+            'B': ['陈', '子', '取', '承', '阴', '际', '卫', '耻', '孙', '阳', '职', '阵', '出', '也', '耿', '辽', '隐', '孤', '阿', '降', '联', '限', '队', '陛', '防'],
+            'V': ['毁', '好', '妈', '姑', '奶', '寻', '姨', '叟', '录', '旭', '如', '舅', '妯', '刀', '灵', '巡', '婚', '--', '杂', '九', '嫌', '妇', '--', '姆', '妨'],
+            'C': ['戏', '邓', '双', '参', '能', '对', '骊', '--', '--', '骒', '台', '劝', '观', '马', '--', '驼', '允', '牟', '骠', '矣', '骈', '艰', '难', '--', '驻'],
+            'X': ['红', '弛', '经', '顷', '级', '结', '线', '引', '纱', '旨', '强', '细', '纲', '纪', '继', '综', '约', '绵', '--', '张', '弱', '绿', '给', '比', '纺']
+        };
+
+        // 解析二级简码数据，过滤掉 "--" 的条目
+        const secondCodeData = [];
+        for (const [rowKey, chars] of Object.entries(secondCodeRawData)) {
+            chars.forEach((char, index) => {
+                if (char !== '--') {
+                    secondCodeData.push({
+                        code: rowKey + secondColumns[index],
+                        char: char
+                    });
+                }
+            });
+        }
 
         // 图片模式的字根配置
         // 每个键对应的字根图片数量，图片命名格式: wubi_roots/键位序号.png
